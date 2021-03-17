@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonStores", "JsonStores\JsonStores.csproj", "{08355564-670D-4D82-957E-9B9C92B8C648}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonStores.Sample", "JsonStores.Sample\JsonStores.Sample.csproj", "{59C8DF2B-EC3B-40E6-A468-F0F012F172CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{08355564-670D-4D82-957E-9B9C92B8C648}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08355564-670D-4D82-957E-9B9C92B8C648}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08355564-670D-4D82-957E-9B9C92B8C648}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59C8DF2B-EC3B-40E6-A468-F0F012F172CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59C8DF2B-EC3B-40E6-A468-F0F012F172CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59C8DF2B-EC3B-40E6-A468-F0F012F172CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59C8DF2B-EC3B-40E6-A468-F0F012F172CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
