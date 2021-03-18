@@ -10,7 +10,9 @@ namespace JsonStores.Sample
         private static int Main(string[] args)
         {
             var command = new RootCommand("Json Stores Sample App");
+
             command.AddConfigCommand();
+            command.AddCountryCommand();
 
             return new CommandLineBuilder(command)
                 .UseDefaults()

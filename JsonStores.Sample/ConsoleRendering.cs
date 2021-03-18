@@ -43,7 +43,7 @@ namespace JsonStores.Sample
         public static void ClearLineAndWriteError(this IConsole console, string message)
         {
             console.ClearLine();
-            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine($"Error: {message}");
             Console.ResetColor();
         }
