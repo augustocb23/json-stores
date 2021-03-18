@@ -47,7 +47,7 @@ namespace JsonStores.Sample.Commands
                 new Argument<string>("name", "Name of the country")
             };
 
-            c.Handler = CommandHandler.Create(async (Country country, IConsole console) =>
+            c.Handler = CommandHandler.Create(async (Country country) =>
             {
                 var store = GetCountriesStore();
                 try
@@ -57,7 +57,7 @@ namespace JsonStores.Sample.Commands
                 }
                 catch (UniquenessConstraintViolationException e)
                 {
-                    console.ClearLineAndWriteError(e.Message);
+                    ConsoleRendering.ClearLineAndWriteError(e.Message);
                 }
             });
 
@@ -72,7 +72,7 @@ namespace JsonStores.Sample.Commands
             };
             c.AddAlias("rm");
 
-            c.Handler = CommandHandler.Create(async (int countryCode, IConsole console) =>
+            c.Handler = CommandHandler.Create(async (int countryCode) =>
             {
                 var store = GetCountriesStore();
                 try
@@ -82,7 +82,7 @@ namespace JsonStores.Sample.Commands
                 }
                 catch (ItemNotFoundException e)
                 {
-                    console.ClearLineAndWriteError(e.Message);
+                    ConsoleRendering.ClearLineAndWriteError(e.Message);
                 }
             });
 

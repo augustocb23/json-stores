@@ -1,6 +1,4 @@
 ﻿using System;
-using System.CommandLine;
-using System.CommandLine.Rendering;
 
 namespace JsonStores.Sample
 {
@@ -9,40 +7,35 @@ namespace JsonStores.Sample
         /// <summary>
         ///     Clear the current line on console, based on cursor position.
         /// </summary>
-        /// <param name="console">The console instance.</param>
-        public static void ClearLine(this IConsole console)
+        public static void ClearLine()
         {
-            var terminal = console.GetTerminal();
-
             // write spaces to override current content
-            var currentPosition = terminal.CursorLeft;
-            terminal.SetCursorPosition(0, terminal.CursorTop);
+            var currentPosition = Console.CursorLeft;
+            Console.SetCursorPosition(0, Console.CursorTop);
             for (var i = 0; i < currentPosition; i++)
-                terminal.Out.Write(" ");
+                Console.Out.Write(" ");
 
             // reset cursor position
-            terminal.SetCursorPosition(0, terminal.CursorTop);
+            Console.SetCursorPosition(0, Console.CursorTop);
         }
 
         /// <summary>
         ///     Clear current line and prints a message.
         /// </summary>
-        /// <param name="console">The console instance.</param>
         /// <param name="message">A string to print.</param>
-        public static void ClearLineAndWrite(this IConsole console, string message)
+        public static void ClearLineAndWrite(string message)
         {
-            console.ClearLine();
+            ClearLine();
             Console.Write(message);
         }
 
         /// <summary>
         ///     Clear current line and prints a message with a red text.
         /// </summary>
-        /// <param name="console">The console instance.</param>
         /// <param name="message">A string representing the error.</param>
-        public static void ClearLineAndWriteError(this IConsole console, string message)
+        public static void ClearLineAndWriteError(string message)
         {
-            console.ClearLine();
+            ClearLine();
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine($"Error: {message}");
             Console.ResetColor();

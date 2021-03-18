@@ -26,7 +26,7 @@ namespace JsonStores.Sample.Commands
             {
                 new Argument<string>("property")
             };
-            c.Handler = CommandHandler.Create(async (bool verbose, string property, IConsole console) =>
+            c.Handler = CommandHandler.Create(async (bool verbose, string property) =>
             {
                 var store = GetSettingsStore();
                 var propertyInfo = typeof(Settings).GetProperty(property,
@@ -34,14 +34,14 @@ namespace JsonStores.Sample.Commands
                 if (propertyInfo is null)
                 {
                     var properties = typeof(Settings).GetProperties().Select(info => info.Name);
-                    console.ClearLineAndWriteError(
+                    ConsoleRendering.ClearLineAndWriteError(
                         $"Invalid property. Available properties: {string.Join(",", properties)}");
                     return 5;
                 }
 
-                if (verbose) console.ClearLineAndWrite("Loading settings...");
+                if (verbose) ConsoleRendering.ClearLineAndWrite("Loading settings...");
                 var settings = await store.ReadOrCreateAsync();
-                console.ClearLineAndWrite($"{propertyInfo.GetValue(settings)}\n");
+                ConsoleRendering.ClearLineAndWrite($"{propertyInfo.GetValue(settings)}\n");
 
                 return 0;
             });
@@ -55,8 +55,7 @@ namespace JsonStores.Sample.Commands
             {
                 new Argument<string>("property"), new Argument<string>("value")
             };
-            c.Handler = CommandHandler.Create(async (bool verbose, string property, string value,
-                IConsole console) =>
+            c.Handler = CommandHandler.Create(async (bool verbose, string property, string value) =>
             {
                 var store = GetSettingsStore();
                 var propertyInfo = typeof(Settings).GetProperty(property,
@@ -64,7 +63,7 @@ namespace JsonStores.Sample.Commands
                 if (propertyInfo is null)
                 {
                     var properties = typeof(Settings).GetProperties().Select(info => info.Name);
-                    console.ClearLineAndWriteError(
+                    ConsoleRendering.ClearLineAndWriteError(
                         $"Invalid property. Available properties: {string.Join(",", properties)}");
                     return 5;
                 }
@@ -78,14 +77,14 @@ namespace JsonStores.Sample.Commands
                         $"Can't change property '{property}'")
                 };
 
-                if (verbose) console.ClearLineAndWrite("Loading settings...");
+                if (verbose) ConsoleRendering.ClearLineAndWrite("Loading settings...");
                 var settings = await store.ReadOrCreateAsync();
 
-                if (verbose) console.ClearLineAndWrite("Saving...");
+                if (verbose) ConsoleRendering.ClearLineAndWrite("Saving...");
                 propertyInfo.SetValue(settings, castedValue);
                 await store.SaveAsync(settings);
 
-                if (verbose) console.ClearLine();
+                if (verbose) ConsoleRendering.ClearLine();
                 return 0;
             });
 
