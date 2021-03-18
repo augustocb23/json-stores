@@ -34,12 +34,11 @@ namespace JsonStores
         /// <summary>
         ///     Last time the content was loaded or persisted.
         /// </summary>
-        private DateTime? LastUpdate { get; set; }
+        private DateTime LastUpdate { get; set; }
 
         /// <summary>
         ///     A flag indicating if the file was changed since last reload.
         /// </summary>
-        /// <remarks>Will always return <c>false</c> if the data was not loaded.</remarks>
         protected bool FileChanged => FileExists && LastFileWrite > LastUpdate;
 
         /// <summary>
