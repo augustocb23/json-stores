@@ -28,9 +28,7 @@ namespace JsonStores.Sample.Commands
             };
             c.Handler = CommandHandler.Create(async (bool verbose, string property, IConsole console) =>
             {
-                var provider = new ServiceCollection().AddJsonStores().BuildServiceProvider();
-                var store = provider.GetRequiredService<IJsonStore<Settings>>();
-
+                var store = GetSettingsStore();
                 var propertyInfo = typeof(Settings).GetProperty(property,
                     BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyInfo is null)
@@ -60,9 +58,7 @@ namespace JsonStores.Sample.Commands
             c.Handler = CommandHandler.Create(async (bool verbose, string property, string value,
                 IConsole console) =>
             {
-                var provider = new ServiceCollection().AddJsonStores().BuildServiceProvider();
-                var store = provider.GetRequiredService<IJsonStore<Settings>>();
-                
+                var store = GetSettingsStore();
                 var propertyInfo = typeof(Settings).GetProperty(property,
                     BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (propertyInfo is null)
@@ -94,6 +90,13 @@ namespace JsonStores.Sample.Commands
             });
 
             command.Add(c);
+        }
+
+        private static IJsonStore<Settings> GetSettingsStore()
+        {
+            // creates a ServiceCollection to simulate the DI container
+            var provider = new ServiceCollection().AddJsonStores().BuildServiceProvider();
+            return provider.GetRequiredService<IJsonStore<Settings>>();
         }
     }
 }
