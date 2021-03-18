@@ -60,10 +60,10 @@ namespace JsonStores
             var properties = typeof(T).GetProperties()
                 .Where(property => property.GetCustomAttributes(typeof(JsonRepositoryId), false).Any()).ToArray();
             if (!properties.Any())
-                throw new InvalidOperationException(
+                throw new InvalidJsonRepositoryIdException(
                     $"Class '{typeof(T).Name}' does not has a key. Create a property with name 'Id' or use {nameof(JsonRepositoryId)} attribute.");
             if (properties.Length > 1)
-                throw new InvalidOperationException(
+                throw new InvalidJsonRepositoryIdException(
                     $"Class '{typeof(T).Name}' contains multiple properties with {nameof(JsonRepositoryId)} attribute.");
 
             var propertyWithAttribute = properties.First();
@@ -75,7 +75,7 @@ namespace JsonStores
         private static void ValidatePropertyType(PropertyInfo property)
         {
             if (property.PropertyType != typeof(TKey))
-                throw new InvalidOperationException(
+                throw new InvalidJsonRepositoryIdException(
                     $"Property '{typeof(T).Name}.{property.Name}' is not from type {typeof(TKey).Name}'.");
         }
 
