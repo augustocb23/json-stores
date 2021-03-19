@@ -15,7 +15,7 @@ namespace JsonStores
     /// </summary>
     /// <typeparam name="T">The type for the collection.</typeparam>
     /// <typeparam name="TKey">The type for the key used to identify a item in the collection.</typeparam>
-    internal class JsonRepository<T, TKey> : AbstractJsonStore<ICollection<T>>, IJsonRepository<T, TKey> where T : class
+    public class JsonRepository<T, TKey> : AbstractJsonStore<ICollection<T>>, IJsonRepository<T, TKey> where T : class
         where TKey : notnull
     {
         /// <summary>
@@ -43,14 +43,14 @@ namespace JsonStores
         /// <returns>A <see cref="Func{T,TKey}"/> to get the property.</returns>
         /// <exception cref="InvalidOperationException">
         ///     The property <c>Id</c> is from other type then <see cref="TKey"/> - or -
-        ///     There is no property with attribute <see cref="JsonRepositoryId"/> - or -
-        ///     There is more then one property with attribute <see cref="JsonRepositoryId"/>.
+        ///     There is no property with attribute <see cref="JsonRepositoryKey"/> - or -
+        ///     There is more then one property with attribute <see cref="JsonRepositoryKey"/>.
         /// </exception>
         private static Expression<Func<T, TKey>> GetKeyProperty()
         {
-            // get key from property Id 
+            // get key from property Id, if don't has IgnoreIdProperty annotation
             var idProperty = typeof(T).GetProperty("Id");
-            if (idProperty != null)
+            if (idProperty != null && typeof(T).GetCustomAttribute<IgnoreIdProperty>() == null)
             {
                 ValidatePropertyType(idProperty);
                 return t => (TKey) idProperty.GetValue(t);
@@ -58,13 +58,13 @@ namespace JsonStores
 
             // look for a property with the atribute JsonRepositoryId
             var properties = typeof(T).GetProperties()
-                .Where(property => property.GetCustomAttributes(typeof(JsonRepositoryId), false).Any()).ToArray();
+                .Where(property => property.GetCustomAttributes(typeof(JsonRepositoryKey), false).Any()).ToArray();
             if (!properties.Any())
-                throw new InvalidJsonRepositoryIdException(
-                    $"Class '{typeof(T).Name}' does not has a key. Create a property with name 'Id' or use {nameof(JsonRepositoryId)} attribute.");
+                throw new InvalidJsonRepositoryKeyException(
+                    $"Class '{typeof(T).Name}' does not has a key. Create a property with name 'Id' or use {nameof(JsonRepositoryKey)} attribute.");
             if (properties.Length > 1)
-                throw new InvalidJsonRepositoryIdException(
-                    $"Class '{typeof(T).Name}' contains multiple properties with {nameof(JsonRepositoryId)} attribute.");
+                throw new InvalidJsonRepositoryKeyException(
+                    $"Class '{typeof(T).Name}' contains multiple properties with {nameof(JsonRepositoryKey)} attribute.");
 
             var propertyWithAttribute = properties.First();
             ValidatePropertyType(propertyWithAttribute);
@@ -75,7 +75,7 @@ namespace JsonStores
         private static void ValidatePropertyType(PropertyInfo property)
         {
             if (property.PropertyType != typeof(TKey))
-                throw new InvalidJsonRepositoryIdException(
+                throw new InvalidJsonRepositoryKeyException(
                     $"Property '{typeof(T).Name}.{property.Name}' is not from type {typeof(TKey).Name}'.");
         }
 
