@@ -6,6 +6,12 @@
     public class ClassNameNamingStrategy : INamingStrategy
     {
         /// <inheritdoc />
-        public string GetName<T>() => typeof(T).Name;
+        public string GetName<T>()
+        {
+            // if is a generic type, use the first parameter
+            return typeof(T).IsGenericType
+                ? typeof(T).GenericTypeArguments[0].Name
+                : typeof(T).Name;
+        }
     }
 }

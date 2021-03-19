@@ -9,7 +9,7 @@
         <Title>JsonStores</Title>
         <Description>Persist your data on JSON files in an easy and flexible way</Description>
         <PackageId>JsonStores</PackageId>
-        <Version>0.1</Version>
+        <Version>0.1.1</Version>
         <Authors>Augusto César Bisognin</Authors>
         <PackageTags>json repository store</PackageTags>
         <RepositoryUrl>https://github.com/augustocb23/json-stores</RepositoryUrl>
