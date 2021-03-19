@@ -6,7 +6,7 @@ using JsonStores.Exceptions;
 
 namespace JsonStores
 {
-    public interface IJsonRepository<T, TKey> where T : class where TKey : notnull
+    public interface IJsonRepository<T, in TKey> where T : class where TKey : notnull
     {
         /// <summary>
         ///     Get all items on the collection.
