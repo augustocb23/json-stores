@@ -6,6 +6,10 @@ Developed on top of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/s
 
 ## Getting started
 
+Install the package from [Nuget](https://www.nuget.org/packages/JsonStores)
+
+    dotnet add package JsonStores --version 0.1.0
+
 Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) using `AddJsonStores()` extension method
 
 ```csharp
@@ -100,4 +104,4 @@ An `InvalidJsonRepositoryKeyException` will be thrown if:
 
 ## Sample app
 
-You can see the usage of both `JsonStore` and `JsonRepository` with the CLI app on [JsonStores.Sample](/JsonStores.Sample) project.
+You can see the usage of both `JsonStore` and `JsonRepository` with the CLI app on [JsonStores.Sample](https://github.com/augustocb23/json-stores/tree/master/JsonStores.Sample) project.
