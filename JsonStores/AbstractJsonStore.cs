@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using JsonStores.Exceptions;
 using JsonStores.NamingStrategies;
 
 namespace JsonStores
@@ -62,12 +63,12 @@ namespace JsonStores
         ///     Asynchronously persist data to file. If the file does not exist, it will be created.
         /// </summary>
         /// <param name="content">The data to persist.</param>
-        /// <exception cref="InvalidOperationException">File was changed after last reload.</exception>
+        /// <exception cref="FileChangedException">File was changed since the last reload.</exception>
         /// <remarks>All existing data will be override.</remarks>
         protected async Task SaveToFileAsync(T content)
         {
             if (FileChanged)
-                throw new InvalidOperationException("File was changed after last reload.");
+                throw new FileChangedException(FileRef.FullName);
 
             Directory.CreateDirectory(FileRef.DirectoryName!);
 
@@ -82,6 +83,7 @@ namespace JsonStores
         /// </summary>
         /// <exception cref="ApplicationException">An error occurred deserializing the file.</exception>
         /// <exception cref="FileNotFoundException">The file is not found.</exception>
+        /// <exception cref="IOException">The file is open by another process.</exception>
         /// <exception cref="JsonException">The file is not in a valid format.</exception>
         protected async Task<T> ReadFileAsync()
         {
