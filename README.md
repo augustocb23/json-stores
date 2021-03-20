@@ -8,7 +8,9 @@ Developed on top of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/s
 
 Install the package from [Nuget](https://www.nuget.org/packages/JsonStores)
 
-    dotnet add package JsonStores --version 0.1.0
+```text
+    dotnet add package JsonStores --version 0.2
+```
 
 Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) using `AddJsonStores()` extension method
 
@@ -75,10 +77,11 @@ Use the class `JsonStoreOptions` to customize
             FileExtension = "arq"
         };
         
-        services.AddScoped<IJsonRepository<MyClass, MyClassId>>(new JsonRepository(options));
+        services.AddJsonRepository<MyClass, MyClassId>(options);
+        services.AddJsonStore<Settings>(options => options.NamingStrategy = new StaticNamingStrategy("configs"));
 
         // you can add generic classes with other options
-        services.AddJsonStores(new JsonStoreOptions { Location = @"D:\configs" }, ServiceLifetime.Singleton);
+        services.AddJsonStores(options => options.Location = @"D:\stores", ServiceLifetime.Transient);
     }
 ```
 

@@ -92,7 +92,9 @@ namespace JsonStores.Sample.Commands
         private static IJsonRepository<Country, int> GetCountriesStore()
         {
             // creates a ServiceCollection to simulate the DI container
-            var provider = new ServiceCollection().AddJsonStores().BuildServiceProvider();
+            var provider = new ServiceCollection()
+                .AddJsonRepository<Country, int>(options => options.Location = @"C:\MyFolder")
+                .BuildServiceProvider();
             return provider.GetRequiredService<IJsonRepository<Country, int>>();
         }
     }
