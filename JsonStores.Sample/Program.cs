@@ -13,6 +13,7 @@ namespace JsonStores.Sample
 
             command.AddConfigCommand();
             command.AddCountryCommand();
+            command.AddNoteCommand();
 
             return new CommandLineBuilder(command)
                 .UseDefaults()

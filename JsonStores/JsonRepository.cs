@@ -80,21 +80,21 @@ namespace JsonStores
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<IEnumerable<T>> GetAllAsync()
         {
             if (Items == null || FileChanged) await LoadAsync();
             return Items;
         }
 
         /// <inheritdoc />
-        public async Task<T> GetByIdAsync(TKey id)
+        public virtual async Task<T> GetByIdAsync(TKey id)
         {
             if (Items == null || FileChanged) await LoadAsync();
             return Items.SingleOrDefault(item => id.Equals(GetKeyValue(item)));
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(T obj)
+        public virtual async Task AddAsync(T obj)
         {
             if (await ExistsAsync(GetKeyValue(obj)))
                 throw new UniquenessConstraintViolationException(obj, GetKeyValue(obj));
@@ -103,7 +103,7 @@ namespace JsonStores
         }
 
         /// <inheritdoc />
-        public async Task UpdateAsync([NotNull] T item)
+        public virtual async Task UpdateAsync([NotNull] T item)
         {
             if (Items == null || FileChanged) await LoadAsync();
 
@@ -112,13 +112,13 @@ namespace JsonStores
         }
 
         /// <inheritdoc />
-        public async Task SaveChangesAsync()
+        public virtual async Task SaveChangesAsync()
         {
             await SaveToFileAsync(Items);
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExistsAsync([NotNull] TKey id)
+        public virtual async Task<bool> ExistsAsync([NotNull] TKey id)
         {
             if (Items == null || FileChanged) await LoadAsync();
 
@@ -126,7 +126,7 @@ namespace JsonStores
         }
 
         /// <inheritdoc />
-        public async Task RemoveAsync([NotNull] TKey id)
+        public virtual async Task RemoveAsync([NotNull] TKey id)
         {
             if (Items == null || FileChanged) await LoadAsync();
 

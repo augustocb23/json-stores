@@ -9,7 +9,7 @@ Developed on top of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/s
 Install the package from [Nuget](https://www.nuget.org/packages/JsonStores)
 
 ```text
-    dotnet add package JsonStores --version 0.2
+    dotnet add package JsonStores --version 0.1.1
 ```
 
 Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) using `AddJsonStores()` extension method
@@ -104,6 +104,23 @@ An `InvalidJsonRepositoryKeyException` will be thrown if:
 - Your class don't have an Id or any property with the `JsonRepositoryKey` annotation.
 - There is more than one property with the `JsonRepositoryKey` annotation.
 - The property type don't match the second generic parameter.
+
+## Personalize your store using inheritance
+
+You can also customize the behavior of your stores just extending `JsonStore` and `JsonRepository` classes.
+
+```csharp
+    public class CustomStore : JsonRepository<MyClass, Guid>
+    {
+        public CustomStore(options) : base(options, obj => obj.ObjId)
+        {
+        }
+
+        // ...
+    }
+```
+
+See the `NoteStore` class on sample app for details.
 
 ## Sample app
 
