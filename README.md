@@ -9,7 +9,7 @@ Developed on top of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/s
 Install the package from [Nuget](https://www.nuget.org/packages/JsonStores)
 
 ```text
-    dotnet add package JsonStores --version 0.1.1
+    dotnet add package JsonStores
 ```
 
 Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) using `AddJsonStores()` extension method
