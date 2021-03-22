@@ -67,7 +67,8 @@ namespace JsonStores
         /// <remarks>All existing data will be override.</remarks>
         protected async Task SaveToFileAsync(T content)
         {
-            if (FileChanged)
+            // if the object was previously loaded, check for changes
+            if (LastUpdate != DateTime.MinValue && FileChanged)
                 throw new FileChangedException(FileRef.FullName);
 
             Directory.CreateDirectory(FileRef.DirectoryName!);
