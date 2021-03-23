@@ -75,6 +75,8 @@ Use the class `JsonStoreOptions` to customize
             NamingStrategy = new StaticNamingStrategy("myFile"),
             // file extension - default is 'json'
             FileExtension = "arq"
+            // looks file writing time to avoid data loss - default is 'true'
+            ThrowOnSavingChangedFile = false;
         };
         
         services.AddJsonRepository<MyClass, MyClassId>(options);
@@ -112,6 +114,8 @@ You can also customize the behavior of your stores just extending `JsonStore` an
 ```csharp
     public class CustomStore : JsonRepository<MyClass, Guid>
     {
+        protected override string FileName => "my-items";
+    
         public CustomStore(options) : base(options, obj => obj.ObjId)
         {
         }

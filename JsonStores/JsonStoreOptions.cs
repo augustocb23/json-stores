@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using JsonStores.Exceptions;
 using JsonStores.NamingStrategies;
 
 namespace JsonStores
@@ -21,6 +22,7 @@ namespace JsonStores
             Location = options.Location;
             NamingStrategy = options.NamingStrategy;
             FileExtension = options.FileExtension;
+            ThrowOnSavingChangedFile = options.ThrowOnSavingChangedFile;
         }
 
         /// <summary>
@@ -37,5 +39,13 @@ namespace JsonStores
         ///     The extension for the JSON file.
         /// </summary>
         public string FileExtension { get; set; } = "json";
+
+        /// <summary>
+        ///     A flag indicating if should look at <see cref="FileInfo.LastWriteTime"/> property when saving after reading the file.
+        /// </summary>
+        /// <remarks>
+        ///     Throws a <see cref="FileChangedException"/> if the file has been changed after loading the content.
+        /// </remarks>
+        public bool ThrowOnSavingChangedFile { get; set; } = true;
     }
 }

@@ -112,8 +112,12 @@ namespace JsonStores
         }
 
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">The content was never loaded.</exception>
         public virtual async Task SaveChangesAsync()
         {
+            if (Items == null)
+                throw new InvalidOperationException("Content was never loaded.");
+
             await SaveToFileAsync(Items);
         }
 
@@ -147,7 +151,7 @@ namespace JsonStores
         }
 
         /// <summary>
-        ///     A collections contained the loaded data.
+        ///     A collections containing the loaded data.
         /// </summary>
         private ICollection<T> Items { get; set; }
 

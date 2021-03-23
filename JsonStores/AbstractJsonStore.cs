@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using JsonStores.Exceptions;
-using JsonStores.NamingStrategies;
 
 namespace JsonStores
 {
@@ -13,24 +12,21 @@ namespace JsonStores
     /// <typeparam name="T">The type used to serialize and deserialize data.</typeparam>
     public abstract class AbstractJsonStore<T> where T : class
     {
+        private readonly JsonStoreOptions _options;
+        private string _fileName;
+
         protected AbstractJsonStore(JsonStoreOptions options)
         {
-            Location = options.Location;
-            NamingStrategy = options.NamingStrategy;
-            FileExtension = options.FileExtension;
-        }
+            if (_options == null)
+                throw new ArgumentNullException(nameof(options));
 
-        private INamingStrategy NamingStrategy { get; }
+            _options = new JsonStoreOptions(options);
+        }
 
         /// <summary>
         ///     A flag indicating if the file exists.
         /// </summary>
-        protected bool FileExists => FileRef.Exists;
-
-        /// <summary>
-        ///     Last time the file was written.
-        /// </summary>
-        private DateTime LastFileWrite => FileRef.LastWriteTime;
+        protected bool FileExists => GetFileInfo().Exists;
 
         /// <summary>
         ///     Last time the content was loaded or persisted.
@@ -40,24 +36,26 @@ namespace JsonStores
         /// <summary>
         ///     A flag indicating if the file was changed since last reload.
         /// </summary>
-        protected bool FileChanged => FileExists && LastFileWrite > LastUpdate;
+        /// <remarks>Always returns <c>true</c> if the data was not loaded.</remarks>
+        protected bool FileChanged
+        {
+            get
+            {
+                var fileInfo = GetFileInfo();
+                return fileInfo.Exists && fileInfo.LastWriteTime > LastUpdate;
+            }
+        }
 
         /// <summary>
-        ///     The directory to save the file.
+        ///     A <see cref="System.IO.FileInfo" /> for the file.
         /// </summary>
-        private string Location { get; }
-
-        /// <summary>
-        ///     A <see cref="FileInfo" /> for the file.
-        /// </summary>
-        private FileInfo FileRef => new FileInfo($@"{Location}\{FileName}.{FileExtension}");
-
-        private string FileExtension { get; }
+        /// <remarks>Always creates a new instance to ensure that the data is up to date.</remarks>
+        private FileInfo GetFileInfo() => new FileInfo($@"{_options.Location}\{FileName}.{_options.FileExtension}");
 
         /// <summary>
         ///     The name of the file to persist the data, without the extension.
         /// </summary>
-        protected virtual string FileName => NamingStrategy.GetName<T>();
+        protected virtual string FileName => _fileName ??= _options.NamingStrategy.GetName<T>();
 
         /// <summary>
         ///     Asynchronously persist data to file. If the file does not exist, it will be created.
@@ -65,15 +63,19 @@ namespace JsonStores
         /// <param name="content">The data to persist.</param>
         /// <exception cref="FileChangedException">File was changed since the last reload.</exception>
         /// <remarks>All existing data will be override.</remarks>
+        /// <seealso cref="JsonStoreOptions.ThrowOnSavingChangedFile"/>
         protected async Task SaveToFileAsync(T content)
         {
+            var fileInfo = GetFileInfo();
+
             // if the object was previously loaded, check for changes
-            if (LastUpdate != DateTime.MinValue && FileChanged)
-                throw new FileChangedException(FileRef.FullName);
+            if (_options.ThrowOnSavingChangedFile &&
+                LastUpdate != DateTime.MinValue && FileChanged)
+                throw new FileChangedException(fileInfo.FullName);
 
-            Directory.CreateDirectory(FileRef.DirectoryName!);
+            Directory.CreateDirectory(fileInfo.DirectoryName!);
 
-            await using var writeStream = FileRef.Create();
+            await using var writeStream = fileInfo.Create();
             var jsonContent = JsonSerializer.SerializeToUtf8Bytes(content);
             await writeStream.WriteAsync(jsonContent);
             LastUpdate = DateTime.Now;
@@ -85,12 +87,12 @@ namespace JsonStores
         /// <exception cref="ApplicationException">An error occurred deserializing the file.</exception>
         /// <exception cref="FileNotFoundException">The file is not found.</exception>
         /// <exception cref="IOException">The file is open by another process.</exception>
-        /// <exception cref="JsonException">The file is not in a valid format.</exception>
         protected async Task<T> ReadFileAsync()
         {
+            var fileInfo = GetFileInfo();
             try
             {
-                await using var readStream = FileRef.Open(FileMode.Open, FileAccess.Read);
+                await using var readStream = fileInfo.Open(FileMode.Open, FileAccess.Read);
                 var content = await JsonSerializer.DeserializeAsync<T>(readStream);
 
                 LastUpdate = DateTime.Now;
@@ -98,7 +100,7 @@ namespace JsonStores
             }
             catch (JsonException e)
             {
-                throw new ApplicationException($"There is a problem with file '{FileRef.FullName}': {e.Message}");
+                throw new ApplicationException($"There is a problem with file '{fileInfo.FullName}': {e.Message}");
             }
         }
     }
