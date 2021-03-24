@@ -1,5 +1,7 @@
 ﻿# JsonStores
 
+![GitHub](https://img.shields.io/github/license/augustocb23/json-stores) ![Nuget](https://img.shields.io/nuget/v/JsonStores) ![Nuget](https://img.shields.io/nuget/dt/JsonStores)
+
 Persist your data on JSON files in an easy and flexible way. You can create an simple store, or a repository that encapsulates a collection of items.
 
 Developed on top of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-overview) and compatible with `netstandard2.1`.
