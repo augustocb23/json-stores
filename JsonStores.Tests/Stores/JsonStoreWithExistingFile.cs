@@ -16,12 +16,7 @@ namespace JsonStores.Tests.Stores
         public JsonStoreWithExistingFile()
         {
             _fileName = Guid.NewGuid().ToString();
-            _content = new Person
-            {
-                Id = 1,
-                FullName = "John",
-                BirthDate = DateTime.UnixEpoch
-            };
+            _content = Constants.GetPerson();
 
             // create a item and save it using a temporally store
             var options = new JsonStoreOptions
@@ -29,12 +24,6 @@ namespace JsonStores.Tests.Stores
                 NamingStrategy = new StaticNamingStrategy(_fileName)
             };
             var store = new JsonStore<Person>(options);
-            _content = new Person
-            {
-                Id = 1,
-                FullName = "John Smith",
-                BirthDate = DateTime.UnixEpoch
-            };
             store.SaveAsync(_content).Wait();
 
             _store = new JsonStore<Person>(options);
@@ -59,11 +48,15 @@ namespace JsonStores.Tests.Stores
         [Fact]
         public async Task ChangeAnItem()
         {
-            _content.FullName = "Thomas Smith";
-            await _store.SaveAsync(_content);
+            var previousContent = await _store.ReadAsync();
+
+            var newContent = Constants.GetPerson();
+            newContent.FullName = "Thomas Smith";
+            await _store.SaveAsync(newContent);
 
             var person = await _store.ReadAsync();
-            Assert.Equal(person, _content);
+            Assert.Equal(person, newContent);
+            Assert.NotEqual(person, previousContent);
         }
 
 
