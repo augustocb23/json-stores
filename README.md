@@ -1,6 +1,6 @@
 ﻿# JsonStores
 
-![GitHub](https://img.shields.io/github/license/augustocb23/json-stores) ![Nuget](https://img.shields.io/nuget/v/JsonStores) ![Nuget](https://img.shields.io/nuget/dt/JsonStores)
+[![GitHub](https://img.shields.io/github/license/augustocb23/json-stores)](LICENSE) [![Nuget](https://img.shields.io/nuget/v/JsonStores)](https://www.nuget.org/packages/JsonStores) [![Nuget](https://img.shields.io/nuget/dt/JsonStores)](https://www.nuget.org/packages/JsonStores)
 
 Persist your data on JSON files in an easy and flexible way. You can create an simple store, or a repository that encapsulates a collection of items.
 
