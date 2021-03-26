@@ -9,8 +9,8 @@
         <Title>JsonStores</Title>
         <Description>Persist your data on JSON files in an easy and flexible way</Description>
         <PackageId>JsonStores</PackageId>
-        <Version>0.3</Version>
-        <PackageReleaseNotes>Added ThrowOnSavingChangedFile option to disable LastWriteTime validation</PackageReleaseNotes>
+        <Version>0.3.1</Version>
+        <PackageReleaseNotes>ArgumentNullException throwing on class constructor</PackageReleaseNotes>
         <Authors>Augusto César Bisognin</Authors>
         <PackageTags>json repository store</PackageTags>
         <RepositoryUrl>https://github.com/augustocb23/json-stores</RepositoryUrl>
