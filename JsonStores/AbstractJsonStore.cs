@@ -17,7 +17,7 @@ namespace JsonStores
 
         protected AbstractJsonStore(JsonStoreOptions options)
         {
-            if (_options == null)
+            if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
             _options = new JsonStoreOptions(options);
