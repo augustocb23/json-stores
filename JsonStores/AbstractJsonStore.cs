@@ -26,7 +26,7 @@ namespace JsonStores
         /// <summary>
         ///     A flag indicating if the file exists.
         /// </summary>
-        protected bool FileExists => GetFileInfo().Exists;
+        protected bool FileExists => File.Exists(FileFullPath);
 
         /// <summary>
         ///     Last time the content was loaded or persisted.
@@ -50,7 +50,12 @@ namespace JsonStores
         ///     A <see cref="System.IO.FileInfo" /> for the file.
         /// </summary>
         /// <remarks>Always creates a new instance to ensure that the data is up to date.</remarks>
-        private FileInfo GetFileInfo() => new FileInfo($@"{_options.Location}\{FileName}.{_options.FileExtension}");
+        private FileInfo GetFileInfo() => new FileInfo(FileFullPath);
+
+        /// <summary>
+        ///     Full file path to the file.
+        /// </summary>
+        private string FileFullPath => $@"{_options.Location}\{FileName}.{_options.FileExtension}";
 
         /// <summary>
         ///     The name of the file to persist the data, without the extension.
@@ -66,18 +71,15 @@ namespace JsonStores
         /// <seealso cref="JsonStoreOptions.ThrowOnSavingChangedFile"/>
         protected async Task SaveToFileAsync(T content)
         {
-            var fileInfo = GetFileInfo();
-
             // if the object was previously loaded, check for changes
             if (_options.ThrowOnSavingChangedFile &&
                 LastUpdate != DateTime.MinValue && FileChanged)
-                throw new FileChangedException(fileInfo.FullName);
+                throw new FileChangedException(FileFullPath);
 
-            Directory.CreateDirectory(fileInfo.DirectoryName!);
+            Directory.CreateDirectory(GetFileInfo().DirectoryName!);
 
-            await using var writeStream = fileInfo.Create();
             var jsonContent = JsonSerializer.SerializeToUtf8Bytes(content);
-            await writeStream.WriteAsync(jsonContent);
+            await File.WriteAllBytesAsync(FileFullPath, jsonContent);
             LastUpdate = DateTime.Now;
         }
 
@@ -89,10 +91,9 @@ namespace JsonStores
         /// <exception cref="IOException">The file is open by another process.</exception>
         protected async Task<T> ReadFileAsync()
         {
-            var fileInfo = GetFileInfo();
             try
             {
-                await using var readStream = fileInfo.Open(FileMode.Open, FileAccess.Read);
+                await using var readStream = File.OpenRead(FileFullPath);
                 var content = await JsonSerializer.DeserializeAsync<T>(readStream);
 
                 LastUpdate = DateTime.Now;
@@ -100,7 +101,7 @@ namespace JsonStores
             }
             catch (JsonException e)
             {
-                throw new ApplicationException($"There is a problem with file '{fileInfo.FullName}': {e.Message}");
+                throw new ApplicationException($"There is a problem with file '{FileFullPath}': {e.Message}");
             }
         }
     }
