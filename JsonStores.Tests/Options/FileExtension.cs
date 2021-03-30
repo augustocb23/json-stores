@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using JsonStores.NamingStrategies;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -15,24 +16,25 @@ namespace JsonStores.Tests.Options
         {
             _person = Constants.GetPerson();
         }
-        
+
         [Fact]
         public async Task JsonExtension()
         {
-            var options = new JsonStoreOptions();
-            _path = $@"{options.Location}\{nameof(Person)}.json";
+            var fileName = Guid.NewGuid().ToString();
+            var options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(fileName)};
+            _path = $@"{options.Location}\{fileName}.json";
             var store = new JsonStore<Person>(options);
 
             await store.SaveAsync(_person);
 
             Assert.True(File.Exists(_path));
-        } 
-        
+        }
+
         [Fact]
         public async Task Generated()
         {
-            var extension = Guid.NewGuid().ToString("N"); 
-            var options = new JsonStoreOptions{FileExtension = extension};
+            var extension = Guid.NewGuid().ToString("N");
+            var options = new JsonStoreOptions {FileExtension = extension};
             _path = $@"{options.Location}\{nameof(Person)}.{extension}";
             var store = new JsonStore<Person>(options);
 

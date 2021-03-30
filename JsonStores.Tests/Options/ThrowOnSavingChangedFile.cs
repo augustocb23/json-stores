@@ -47,13 +47,18 @@ namespace JsonStores.Tests.Options
             var person = await store.ReadAsync();
 
             // change it using another instance
-            var store2 = new JsonStore<Person>(_options);
-            person.FullName = Guid.NewGuid().ToString("N");
-            await store2.SaveAsync(person);
+            await Task.Run(async () =>
+            {
+                var store2 = new JsonStore<Person>(_options);
+                person.FullName = Guid.NewGuid().ToString("N");
+                await store2.SaveAsync(person);
+            });
 
             // change it again and try to save
             var newPerson = Constants.GetPerson();
             newPerson.FullName = Guid.NewGuid().ToString("N");
+
+            // wait to ensure the time will be different
             await Assert.ThrowsAsync<FileChangedException>(() => store.SaveAsync(newPerson));
         }
 
@@ -74,7 +79,7 @@ namespace JsonStores.Tests.Options
             var newPerson = Constants.GetPerson();
             newPerson.FullName = Guid.NewGuid().ToString("N");
             await store2.SaveAsync(newPerson);
-            
+
             // ensure the file was saved
             var readContent = await store2.ReadAsync();
             Assert.Equal(newPerson, readContent);
