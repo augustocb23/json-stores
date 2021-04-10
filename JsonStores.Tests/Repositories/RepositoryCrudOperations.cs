@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using JsonStores.Exceptions;
 using JsonStores.NamingStrategies;
@@ -21,18 +20,16 @@ namespace JsonStores.Tests.Repositories
             _options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)};
 
             // create a file with an item
-            var content = new[] {Constants.GetPerson()};
-            var jsonContent = JsonSerializer.SerializeToUtf8Bytes(content);
-            var fullPath = Path.Combine(_options.Location, $"{_path}.json");
-            File.WriteAllBytes(fullPath, jsonContent);
+            var filePath = Path.Combine(_options.Location, $"{_path}.json");
+            JsonFileCreator.CreateSingleItemRepository(filePath);
         }
-        
+
         [Theory]
         [InlineData(1, true)]
         [InlineData(999, false)]
         public async Task Exists(int id, bool expected)
         {
-            var store = new JsonRepository<Person, int>(_options);
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
 
             var idExists = await store.ExistsAsync(id);
             Assert.Equal(expected, idExists);
@@ -43,7 +40,7 @@ namespace JsonStores.Tests.Repositories
         [InlineData(999, null)]
         public async Task GetById(int id, string expectedName)
         {
-            var store = new JsonRepository<Person, int>(_options);
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
 
             var person = await store.GetByIdAsync(id);
             Assert.Equal(expectedName, person?.FullName);
@@ -52,7 +49,7 @@ namespace JsonStores.Tests.Repositories
         [Fact]
         public async Task GetAll()
         {
-            var store = new JsonRepository<Person, int>(_options);
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
 
             var persons = await store.GetAllAsync();
 
@@ -62,7 +59,7 @@ namespace JsonStores.Tests.Repositories
         [Fact]
         public async Task Add_Success()
         {
-            var store = new JsonRepository<Person, int>(_options);
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
 
             var person2 = Constants.GetPerson2();
             await store.AddAsync(person2);
@@ -79,7 +76,7 @@ namespace JsonStores.Tests.Repositories
         [Fact]
         public async Task Add_IdViolation()
         {
-            var store = new JsonRepository<Person, int>(_options);
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
 
             await Assert.ThrowsAsync<UniquenessConstraintViolationException>(
                 () => store.AddAsync(Constants.GetPerson()));
@@ -88,7 +85,7 @@ namespace JsonStores.Tests.Repositories
         [Fact]
         public async Task SavingEmptyList()
         {
-            var store = new JsonRepository<Person, int>(_options);
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await store.SaveChangesAsync());
         }

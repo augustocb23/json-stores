@@ -10,7 +10,7 @@ namespace JsonStores.Tests.Stores
     public class JsonStoreWithExistingFile : IDisposable
     {
         private readonly string _fileName;
-        private readonly JsonStore<Person> _store;
+        private readonly IJsonStore<Person> _store;
         private readonly Person _content;
 
         public JsonStoreWithExistingFile()
@@ -18,13 +18,13 @@ namespace JsonStores.Tests.Stores
             _fileName = Guid.NewGuid().ToString();
             _content = Constants.GetPerson();
 
-            // create a item and save it using a temporally store
+            // create a file
             var options = new JsonStoreOptions
             {
                 NamingStrategy = new StaticNamingStrategy(_fileName)
             };
-            var store = new JsonStore<Person>(options);
-            store.SaveAsync(_content).Wait();
+            var filePath = Path.Combine(options.Location, $"{_fileName}.json");
+            JsonFileCreator.CreateStore(filePath);
 
             _store = new JsonStore<Person>(options);
         }

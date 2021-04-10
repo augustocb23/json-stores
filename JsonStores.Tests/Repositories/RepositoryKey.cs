@@ -43,8 +43,9 @@ namespace JsonStores.Tests.Repositories
         [Fact]
         public async Task CreateRepositoryWithKey_Attribute()
         {
-            JsonRepository<RepositoryTestModels.PersonIdWithAttribute, int> GetRepository() =>
-                new(new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)});
+            IJsonRepository<RepositoryTestModels.PersonIdWithAttribute, int> GetRepository() =>
+                new JsonRepository<RepositoryTestModels.PersonIdWithAttribute, int>(new JsonStoreOptions
+                    {NamingStrategy = new StaticNamingStrategy(_path)});
 
             var repository = GetRepository();
 
@@ -65,8 +66,9 @@ namespace JsonStores.Tests.Repositories
         [Fact]
         public async Task CreateRepositoryWithLambda()
         {
-            JsonRepository<RepositoryTestModels.PersonWithoutId, int> GetRepository() =>
-                new(new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)},
+            IJsonRepository<RepositoryTestModels.PersonWithoutId, int> GetRepository() =>
+                new JsonRepository<RepositoryTestModels.PersonWithoutId, int>(
+                    new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)},
                     person => person.Number);
 
             // add an item
