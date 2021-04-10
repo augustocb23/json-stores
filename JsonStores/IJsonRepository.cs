@@ -25,6 +25,7 @@ namespace JsonStores
         ///     Add a object to the collection.
         /// </summary>
         /// <param name="obj">Object to add to the collection.</param>
+        /// <exception cref="UniquenessConstraintViolationException">There is already an item with the same Id.</exception>
         Task AddAsync(T obj);
 
         /// <summary>
@@ -38,6 +39,8 @@ namespace JsonStores
         ///     Save the actual items list to file.
         /// </summary>
         /// <exception cref="InvalidOperationException">File was changed after last reload.</exception>
+        /// <exception cref="FileChangedException">File was changed since the last reload.</exception>
+        /// <seealso cref="JsonStoreOptions.ThrowOnSavingChangedFile"/>
         Task SaveChangesAsync();
 
         /// <summary>
@@ -51,8 +54,7 @@ namespace JsonStores
         ///     Remove the item with the given Id.
         /// </summary>
         /// <param name="id">Id og the item to remove.</param>
-        /// <exception cref="InvalidOperationException">Requested item not found.</exception>
-        /// <exception cref="ItemNotFoundException">The list is empty.</exception>
+        /// <exception cref="ItemNotFoundException">The item was not found.</exception>
         Task RemoveAsync([NotNull] TKey id);
     }
 }
