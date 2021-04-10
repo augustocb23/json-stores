@@ -83,6 +83,53 @@ namespace JsonStores.Tests.Repositories
         }
 
         [Fact]
+        public async Task Update_NotExisting()
+        {
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
+            var notExistingItem = new Person {Id = 999, FullName = "Nobody"};
+
+            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await store.UpdateAsync(notExistingItem));
+        }
+
+        [Fact]
+        public async Task Update_Success()
+        {
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
+            var person = Constants.GetPerson();
+            person.FullName = Guid.NewGuid().ToString();
+
+            await store.UpdateAsync(person);
+            await store.SaveChangesAsync();
+
+            // reloads the item
+            IJsonRepository<Person, int> newStore = new JsonRepository<Person, int>(_options);
+            var newPerson = await newStore.GetByIdAsync(person.Id);
+
+            Assert.Equal(person, newPerson);
+        }
+
+        [Fact]
+        public async Task Remove_NotExisting()
+        {
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
+
+            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await store.RemoveAsync(999));
+        }
+
+        [Fact]
+        public async Task Remove_Success()
+        {
+            IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
+
+            await store.RemoveAsync(1);
+            await store.SaveChangesAsync();
+
+            IJsonRepository<Person, int> newStore = new JsonRepository<Person, int>(_options);
+            var items = await newStore.GetAllAsync();
+            Assert.Empty(items);
+        }
+
+        [Fact]
         public async Task SavingEmptyList()
         {
             IJsonRepository<Person, int> store = new JsonRepository<Person, int>(_options);
