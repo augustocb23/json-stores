@@ -72,9 +72,14 @@ namespace JsonStores
         protected async Task SaveToFileAsync(T content)
         {
             // if the object was previously loaded, check for changes
-            if (_options.ThrowOnSavingChangedFile &&
-                LastUpdate != DateTime.MinValue && FileChanged)
-                throw new FileChangedException(FileFullPath);
+            if (_options.ThrowOnSavingChangedFile)
+            {
+                // wait to ensure the time (ticks) will be different
+                await Task.Delay(1);
+
+                if (LastUpdate != DateTime.MinValue && FileChanged)
+                    throw new FileChangedException(FileFullPath);
+            }
 
             Directory.CreateDirectory(GetFileInfo().DirectoryName!);
 
