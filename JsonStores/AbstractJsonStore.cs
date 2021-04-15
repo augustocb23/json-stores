@@ -75,7 +75,7 @@ namespace JsonStores
             if (_options.ThrowOnSavingChangedFile)
             {
                 // wait to ensure the time (ticks) will be different
-                await Task.Delay(1);
+                await Task.Delay(10);
 
                 if (LastUpdate != DateTime.MinValue && FileChanged)
                     throw new FileChangedException(FileFullPath);
