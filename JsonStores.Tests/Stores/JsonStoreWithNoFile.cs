@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using JsonStores.NamingStrategies;
+using JsonStores.Tests.Helpers;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -57,7 +58,7 @@ namespace JsonStores.Tests.Stores
         {
             GC.SuppressFinalize(this);
 
-            File.Delete(_fileName);
+            File.Delete(FilePathEvaluator.GetFilePath(_fileName));
         }
     }
 }

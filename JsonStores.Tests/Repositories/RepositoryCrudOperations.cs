@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JsonStores.Exceptions;
 using JsonStores.NamingStrategies;
+using JsonStores.Tests.Helpers;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -11,17 +12,15 @@ namespace JsonStores.Tests.Repositories
 {
     public class RepositoryCrudOperations : IDisposable
     {
-        private readonly string _path;
+        private readonly string _fileName;
         private readonly JsonStoreOptions _options;
 
         public RepositoryCrudOperations()
         {
-            _path = Guid.NewGuid().ToString("N");
-            _options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)};
+            _fileName = Guid.NewGuid().ToString("N");
+            _options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_fileName)};
 
-            // create a file with an item
-            var filePath = Path.Combine(_options.Location, $"{_path}.json");
-            JsonFileCreator.CreateSingleItemRepository(filePath);
+            JsonFileCreator.CreateSingleItemRepository(_fileName);
         }
 
         [Theory]
@@ -141,7 +140,7 @@ namespace JsonStores.Tests.Repositories
         {
             GC.SuppressFinalize(this);
 
-            File.Delete(_path);
+            File.Delete(FilePathEvaluator.GetFilePath(_fileName));
         }
     }
 }
