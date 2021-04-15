@@ -1,7 +1,6 @@
 ﻿using System;
-using JsonStores.Tests.Models;
 
-namespace JsonStores.Tests
+namespace JsonStores.Tests.Models
 {
     public static class Constants
     {
