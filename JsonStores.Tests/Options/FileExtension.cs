@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using JsonStores.NamingStrategies;
+using JsonStores.Tests.Helpers;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -22,7 +23,7 @@ namespace JsonStores.Tests.Options
         {
             var fileName = Guid.NewGuid().ToString();
             var options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(fileName)};
-            _path = $@"{options.Location}\{fileName}.json";
+            _path = FilePathEvaluator.GetFilePath(fileName, "json");
             var store = new JsonStore<Person>(options);
 
             await store.SaveAsync(_person);
@@ -35,7 +36,7 @@ namespace JsonStores.Tests.Options
         {
             var extension = Guid.NewGuid().ToString("N");
             var options = new JsonStoreOptions {FileExtension = extension};
-            _path = $@"{options.Location}\{nameof(Person)}.{extension}";
+            _path = FilePathEvaluator.GetFilePath(nameof(Person), extension);
             var store = new JsonStore<Person>(options);
 
             await store.SaveAsync(_person);

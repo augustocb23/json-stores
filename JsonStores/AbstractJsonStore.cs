@@ -55,7 +55,7 @@ namespace JsonStores
         /// <summary>
         ///     Full file path to the file.
         /// </summary>
-        private string FileFullPath => $@"{_options.Location}\{FileName}.{_options.FileExtension}";
+        private string FileFullPath => Path.Combine(_options.Location, $"{FileName}.{_options.FileExtension}");
 
         /// <summary>
         ///     The name of the file to persist the data, without the extension.
