@@ -20,8 +20,7 @@ namespace JsonStores.Tests.Repositories
             _options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)};
 
             // create a file with an item
-            var filePath = Path.Combine(_options.Location, $"{_path}.json");
-            JsonFileCreator.CreateSingleItemRepository(filePath);
+            JsonFileCreator.CreateSingleItemRepository(_options.GetFileFullPath(_path));
         }
 
         [Theory]
