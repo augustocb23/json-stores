@@ -20,8 +20,7 @@ namespace JsonStores.Tests
         private static void SaveFile(string path, object content)
         {
             var jsonContent = JsonSerializer.SerializeToUtf8Bytes(content);
-            var fullPath = path;
-            File.WriteAllBytes(fullPath, jsonContent);
+            File.WriteAllBytes(path, jsonContent);
         }
     }
 }

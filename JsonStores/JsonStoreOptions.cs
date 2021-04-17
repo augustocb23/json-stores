@@ -47,5 +47,15 @@ namespace JsonStores
         ///     Throws a <see cref="FileChangedException"/> if the file has been changed after loading the content.
         /// </remarks>
         public bool ThrowOnSavingChangedFile { get; set; } = true;
+
+        /// <summary>
+        ///     Gets full path to the file for specified type, using current <see cref="NamingStrategy"/>.
+        /// </summary>
+        /// <typeparam name="T">The generic type to use with <see cref="INamingStrategy.GetName{T}"/> method.</typeparam>
+        /// <returns>Full path to the file.</returns>
+        public string GetFileFullPath<T>()
+        {
+            return Path.Combine(Location, $"{NamingStrategy.GetName<T>()}.{FileExtension}");
+        }
     }
 }
