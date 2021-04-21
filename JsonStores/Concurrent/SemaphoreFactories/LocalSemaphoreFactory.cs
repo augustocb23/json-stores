@@ -10,6 +10,10 @@ namespace JsonStores.Concurrent.SemaphoreFactories
     {
         private Semaphore _semaphore;
 
+        /// <inheritdoc />
+        /// <summary>
+        ///     Gets a singleton semaphore instance. The <typeparamref name="T"/> param is ignored.
+        /// </summary>
         public Semaphore GetSemaphore<T>()
         {
             return _semaphore ??= new Semaphore(1, 1);
