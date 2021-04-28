@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 
 namespace JsonStores.Concurrent.SemaphoreFactories
@@ -48,11 +49,13 @@ namespace JsonStores.Concurrent.SemaphoreFactories
         {
             _semaphores ??= new ConcurrentDictionary<string, Semaphore>();
 
-            var fileName = _options.GetFileFullPath<T>();
+            // get the file name, replacing directory separators since named semaphores can't have it
+            var fileName = _options.GetFileFullPath<T>()
+                .Replace(Path.DirectorySeparatorChar.ToString(), ";");
             if (_semaphores.ContainsKey(fileName))
                 return _semaphores[fileName];
 
-            var semaphore = new Semaphore(1, 1, $"{_semaphorePrefix}/{fileName}");
+            var semaphore = new Semaphore(1, 1, $"{_semaphorePrefix};{fileName}");
             _semaphores.Add(fileName, semaphore);
 
             return semaphore;
