@@ -6,6 +6,11 @@ using JsonStores.Exceptions;
 
 namespace JsonStores
 {
+    /// <summary>
+    ///     Represents a store to persist a collection of items.
+    /// </summary>
+    /// <typeparam name="T">The type for the collection.</typeparam>
+    /// <typeparam name="TKey">The type for the key used to identify a item in the collection.</typeparam>
     public interface IJsonRepository<T, in TKey> where T : class where TKey : notnull
     {
         /// <summary>

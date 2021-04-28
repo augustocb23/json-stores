@@ -10,11 +10,7 @@ using JsonStores.Exceptions;
 
 namespace JsonStores
 {
-    /// <summary>
-    ///     An implementation for <see cref="AbstractJsonStore{T}" /> to store a collection of items.
-    /// </summary>
-    /// <typeparam name="T">The type for the collection.</typeparam>
-    /// <typeparam name="TKey">The type for the key used to identify a item in the collection.</typeparam>
+    /// <inheritdoc cref="IJsonRepository{T,TKey}"/>
     public class JsonRepository<T, TKey> : AbstractJsonStore<ICollection<T>>, IJsonRepository<T, TKey> where T : class
         where TKey : notnull
     {
