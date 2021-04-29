@@ -1,0 +1,63 @@
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using JsonStores.Concurrent;
+using JsonStores.Concurrent.SemaphoreFactories;
+using JsonStores.NamingStrategies;
+using JsonStores.Tests.Models;
+using Xunit;
+
+namespace JsonStores.Tests.Concurrent.Stores
+{
+    public class ConcurrentJsonStoreExistingFile : IDisposable
+    {
+        private readonly string _fileName;
+        private readonly ISemaphoreFactory _semaphoreFactory;
+        private readonly JsonStoreOptions _options;
+
+        public ConcurrentJsonStoreExistingFile()
+        {
+            // creates a file
+            _fileName = Guid.NewGuid().ToString();
+            _semaphoreFactory = new LocalSemaphoreFactory();
+
+            // create a file
+            _options = new JsonStoreOptions
+            {
+                NamingStrategy = new StaticNamingStrategy(_fileName)
+            };
+            var filePath = Path.Combine(_options.Location, $"{_fileName}.json");
+            JsonFileCreator.CreateStore(filePath);
+        }
+
+        [Fact]
+        public async Task ReadItem()
+        {
+            var store = new ConcurrentJsonStore<Person>(_options, _semaphoreFactory);
+
+            var person = await store.ReadAsync();
+            Assert.Equal(Constants.GetPerson(), person);
+        }
+
+        [Fact]
+        public void ReadAndSave()
+        {
+            var store = new ConcurrentJsonStore<Person>(_options, _semaphoreFactory);
+            var person2 = Constants.GetPerson2();
+
+            // use a task to change the item and other to read it
+            Task.WaitAll(
+                Task.Run(async () => await store.SaveAsync(person2)),
+                Task.Run(async () => await store.ReadAsync())
+            );
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+
+            _semaphoreFactory.Dispose();
+            File.Delete(_fileName);
+        }
+    }
+}
