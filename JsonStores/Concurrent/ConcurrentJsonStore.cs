@@ -22,17 +22,44 @@ namespace JsonStores.Concurrent
 
         public async Task<T> ReadAsync()
         {
-            throw new System.NotImplementedException();
+            if (!FileExists) return null;
+            return await ReadItemAsync();
         }
 
         public async Task<T> ReadOrCreateAsync()
         {
-            throw new System.NotImplementedException();
+            if (!FileExists) return new T();
+            return await ReadItemAsync();
         }
 
-        public async Task SaveAsync(T obj)
+        private async Task<T> ReadItemAsync()
         {
-            throw new System.NotImplementedException();
+            var semaphore = _semaphoreFactory.GetSemaphore<T>();
+
+            try
+            {
+                semaphore.WaitOne();
+                return await ReadFileAsync();
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
+
+        public async Task SaveAsync(T item)
+        {
+            var semaphore = _semaphoreFactory.GetSemaphore<T>();
+
+            try
+            {
+                semaphore.WaitOne();
+                await SaveToFileAsync(item);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public void Dispose()
