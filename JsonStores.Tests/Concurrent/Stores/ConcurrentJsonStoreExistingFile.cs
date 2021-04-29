@@ -52,6 +52,19 @@ namespace JsonStores.Tests.Concurrent.Stores
             );
         }
 
+        [Fact]
+        public async Task ChangeItem()
+        {
+            var store1 = new ConcurrentJsonStore<Person>(_options, _semaphoreFactory);
+            var newPerson = Constants.GetPerson2();
+            await store1.SaveAsync(newPerson);
+
+            // use another store to read
+            var store2 = new ConcurrentJsonStore<Person>(_options, _semaphoreFactory);
+            var person = await store2.ReadAsync();
+            Assert.Equal(Constants.GetPerson2(), person);
+        }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);
