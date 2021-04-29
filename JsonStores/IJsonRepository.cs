@@ -10,7 +10,7 @@ namespace JsonStores
     ///     Represents a store to persist a collection of items.
     /// </summary>
     /// <typeparam name="T">The type for the collection.</typeparam>
-    /// <typeparam name="TKey">The type for the key used to identify a item in the collection.</typeparam>
+    /// <typeparam name="TKey">The type for the key used to identify an item in the collection.</typeparam>
     public interface IJsonRepository<T, in TKey> where T : class where TKey : notnull
     {
         /// <summary>
@@ -27,11 +27,11 @@ namespace JsonStores
         Task<T> GetByIdAsync(TKey id);
 
         /// <summary>
-        ///     Add a object to the collection.
+        ///     Adds an item to the collection.
         /// </summary>
-        /// <param name="obj">Object to add to the collection.</param>
+        /// <param name="item">Item to add to the collection.</param>
         /// <exception cref="UniquenessConstraintViolationException">There is already an item with the same Id.</exception>
-        Task AddAsync(T obj);
+        Task AddAsync(T item);
 
         /// <summary>
         ///     Receives a item and change it.
@@ -41,7 +41,7 @@ namespace JsonStores
         Task UpdateAsync([NotNull] T item);
 
         /// <summary>
-        ///     Save the actual items list to file.
+        ///     Saves the actual items list to file.
         /// </summary>
         /// <exception cref="InvalidOperationException">File was changed after last reload.</exception>
         /// <exception cref="FileChangedException">File was changed since the last reload.</exception>
@@ -56,7 +56,7 @@ namespace JsonStores
         Task<bool> ExistsAsync([NotNull] TKey id);
 
         /// <summary>
-        ///     Remove the item with the given Id.
+        ///     Removes the item with the given Id.
         /// </summary>
         /// <param name="id">Id og the item to remove.</param>
         /// <exception cref="ItemNotFoundException">The item was not found.</exception>

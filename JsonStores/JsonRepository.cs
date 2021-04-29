@@ -90,12 +90,12 @@ namespace JsonStores
         }
 
         /// <inheritdoc />
-        public virtual async Task AddAsync(T obj)
+        public virtual async Task AddAsync(T item)
         {
-            if (await ExistsAsync(GetKeyValue(obj)))
-                throw new UniquenessConstraintViolationException(obj, GetKeyValue(obj));
+            if (await ExistsAsync(GetKeyValue(item)))
+                throw new UniquenessConstraintViolationException(item, GetKeyValue(item));
 
-            Items.Add(obj);
+            Items.Add(item);
         }
 
         /// <inheritdoc />
