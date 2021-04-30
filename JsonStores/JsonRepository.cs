@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
-using JsonStores.Annotations;
 using JsonStores.Exceptions;
+using JsonStores.Helpers;
 
 namespace JsonStores
 {
@@ -15,64 +14,23 @@ namespace JsonStores
         where TKey : notnull
     {
         /// <summary>
-        ///     Creates a new instance of <see cref="JsonRepository{T,TKey}"/> with the given options. 
+        ///     Creates a new instance with the given options.
         /// </summary>
         /// <param name="options">The options for this repository.</param>
         public JsonRepository(JsonStoreOptions options) : base(options)
         {
-            Key = GetKeyProperty();
+            var keyProperty = RepositoryKeyValidator.GetKeyProperty<T, TKey>();
+            GetKeyValue = keyProperty.Compile();
         }
 
         /// <summary>
-        ///     Creates a new instance of <see cref="JsonRepository{T,TKey}"/> with the given options and key. 
+        ///     Creates a new instance with the given options and key.
         /// </summary>
         /// <param name="options">The options for this repository.</param>
-        /// <param name="key">A <see cref="Func{T,TKey}"/> to get the object's key.</param>
-        public JsonRepository(JsonStoreOptions options, Expression<Func<T, TKey>> key) : base(options)
+        /// <param name="keyProperty">A <see cref="Func{T,TKey}"/> to get the object's key.</param>
+        public JsonRepository(JsonStoreOptions options, Expression<Func<T, TKey>> keyProperty) : base(options)
         {
-            Key = key;
-        }
-
-        /// <summary>
-        ///     Look for an Id property on given type.
-        /// </summary>
-        /// <returns>A <see cref="Func{T,TKey}"/> to get the property.</returns>
-        /// <exception cref="InvalidOperationException">
-        ///     The property <c>Id</c> is from other type then <see cref="TKey"/> - or -
-        ///     There is no property with attribute <see cref="JsonRepositoryKey"/> - or -
-        ///     There is more then one property with attribute <see cref="JsonRepositoryKey"/>.
-        /// </exception>
-        private static Expression<Func<T, TKey>> GetKeyProperty()
-        {
-            // get key from property Id, if don't has IgnoreIdProperty annotation
-            var idProperty = typeof(T).GetProperty("Id");
-            if (idProperty != null && typeof(T).GetCustomAttribute<IgnoreIdProperty>() == null)
-            {
-                ValidatePropertyType(idProperty);
-                return t => (TKey) idProperty.GetValue(t);
-            }
-
-            // look for a property with the atribute JsonRepositoryId
-            var properties = typeof(T).GetProperties()
-                .Where(property => property.GetCustomAttributes(typeof(JsonRepositoryKey), false).Any()).ToArray();
-            if (!properties.Any())
-                throw new InvalidJsonRepositoryKeyException(
-                    $"Class '{typeof(T).Name}' does not has a key. Create a property with name 'Id' or use {nameof(JsonRepositoryKey)} attribute.");
-            if (properties.Length > 1)
-                throw new InvalidJsonRepositoryKeyException(
-                    $"Class '{typeof(T).Name}' contains multiple properties with {nameof(JsonRepositoryKey)} attribute.");
-
-            var propertyWithAttribute = properties.First();
-            ValidatePropertyType(propertyWithAttribute);
-
-            return t => (TKey) propertyWithAttribute.GetValue(t);
-        }
-
-        private static void ValidatePropertyType(PropertyInfo property)
-        {
-            if (property.PropertyType != typeof(TKey))
-                throw new InvalidJsonRepositoryKeyException(
-                    $"Property '{typeof(T).Name}.{property.Name}' is not from type {typeof(TKey).Name}'.");
+            GetKeyValue = keyProperty.Compile();
         }
 
         /// <inheritdoc />
@@ -152,13 +110,8 @@ namespace JsonStores
         private ICollection<T> Items { get; set; }
 
         /// <summary>
-        ///     A property that contains a key that identifies a unique item.
-        /// </summary>
-        private Expression<Func<T, TKey>> Key { get; }
-
-        /// <summary>
         ///     Method used to obtain an object's key value.
         /// </summary>
-        private Func<T, TKey> GetKeyValue => Key.Compile();
+        private Func<T, TKey> GetKeyValue { get; }
     }
 }
