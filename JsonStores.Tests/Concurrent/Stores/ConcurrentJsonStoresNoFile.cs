@@ -19,6 +19,11 @@ namespace JsonStores.Tests.Concurrent.Stores
             _store = new ConcurrentJsonStore<Person>(options, new LocalSemaphoreFactory());
         }
 
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
+
         [Fact]
         public async Task GetNullValue()
         {
@@ -34,13 +39,6 @@ namespace JsonStores.Tests.Concurrent.Stores
             var person = await _store.ReadOrCreateAsync();
 
             Assert.Equal(expected, person);
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-
-            _store?.Dispose();
         }
     }
 }

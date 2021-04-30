@@ -12,8 +12,8 @@ namespace JsonStores.Tests.Concurrent.Stores
     public class ConcurrentJsonStoreExistingFile : IDisposable
     {
         private readonly string _fileName;
-        private readonly ISemaphoreFactory _semaphoreFactory;
         private readonly JsonStoreOptions _options;
+        private readonly ISemaphoreFactory _semaphoreFactory;
 
         public ConcurrentJsonStoreExistingFile()
         {
@@ -28,6 +28,13 @@ namespace JsonStores.Tests.Concurrent.Stores
             };
             var filePath = Path.Combine(_options.Location, $"{_fileName}.json");
             JsonFileCreator.CreateStore(filePath);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+
+            File.Delete(_fileName);
         }
 
         [Fact]
@@ -63,14 +70,6 @@ namespace JsonStores.Tests.Concurrent.Stores
             var store2 = new ConcurrentJsonStore<Person>(_options, _semaphoreFactory);
             var person = await store2.ReadAsync();
             Assert.Equal(Constants.GetPerson2(), person);
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-
-            _semaphoreFactory.Dispose();
-            File.Delete(_fileName);
         }
     }
 }

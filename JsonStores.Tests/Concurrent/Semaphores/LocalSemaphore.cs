@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Reflection;
 using JsonStores.Concurrent.SemaphoreFactories;
 using JsonStores.Tests.Models;
 using Xunit;
 
 namespace JsonStores.Tests.Concurrent.Semaphores
 {
-    public class LocalSemaphore : IDisposable
+    public class LocalSemaphore
     {
         private readonly ISemaphoreFactory _factory;
 
@@ -41,13 +40,6 @@ namespace JsonStores.Tests.Concurrent.Semaphores
 
             Assert.NotNull(expected);
             Assert.Equal(expected, actual);
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-
-            _factory?.Dispose();
         }
     }
 }

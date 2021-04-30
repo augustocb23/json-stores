@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using JsonStores.Concurrent.SemaphoreFactories;
 using JsonStores.Tests.Models;
@@ -7,7 +6,7 @@ using Xunit;
 
 namespace JsonStores.Tests.Concurrent.Semaphores
 {
-    public class PerFileSemaphore : IDisposable
+    public class PerFileSemaphore
     {
         private readonly ISemaphoreFactory _factory;
         private readonly JsonStoreOptions _options;
@@ -67,7 +66,8 @@ namespace JsonStores.Tests.Concurrent.Semaphores
         }
 
         /// <summary>
-        ///     Use a task to simulate a file operation and checks if second semaphore will receive a signal before <paramref name="waitDelay"/>.
+        ///     Use a task to simulate a file operation and checks if second semaphore will receive a signal before
+        ///     <paramref name="waitDelay" />.
         /// </summary>
         /// <param name="taskSemaphore">First semaphore.</param>
         /// <param name="taskDelay">Task duration in milliseconds.</param>
@@ -91,13 +91,6 @@ namespace JsonStores.Tests.Concurrent.Semaphores
             waitSemaphore.Release();
 
             return released;
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-
-            _factory.Dispose();
         }
     }
 }

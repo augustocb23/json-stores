@@ -13,8 +13,8 @@ namespace JsonStores.Tests.Concurrent.Repositories
 {
     public class RepositoryCrudOperations : IDisposable
     {
-        private readonly string _path;
         private readonly JsonStoreOptions _options;
+        private readonly string _path;
         private readonly ISemaphoreFactory _semaphoreFactory;
 
         public RepositoryCrudOperations()
@@ -26,6 +26,13 @@ namespace JsonStores.Tests.Concurrent.Repositories
             // create a file with an item
             var filePath = Path.Combine(_options.Location, $"{_path}.json");
             JsonFileCreator.CreateSingleItemRepository(filePath);
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+
+            File.Delete(_path);
         }
 
         [Theory]
@@ -151,14 +158,6 @@ namespace JsonStores.Tests.Concurrent.Repositories
                 new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await store.SaveChangesAsync());
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-
-            _semaphoreFactory.Dispose();
-            File.Delete(_path);
         }
     }
 }

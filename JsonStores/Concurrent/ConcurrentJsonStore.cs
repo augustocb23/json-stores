@@ -1,17 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using JsonStores.Concurrent.SemaphoreFactories;
 
 namespace JsonStores.Concurrent
 {
-    /// <inheritdoc cref="IConcurrentJsonStore{T}"/>
-    public class ConcurrentJsonStore<T> : AbstractJsonStore<T>, IConcurrentJsonStore<T>, IDisposable
+    /// <inheritdoc cref="IConcurrentJsonStore{T}" />
+    public class ConcurrentJsonStore<T> : AbstractJsonStore<T>, IConcurrentJsonStore<T>
         where T : class, new()
     {
         private readonly ISemaphoreFactory _semaphoreFactory;
 
         /// <summary>
-        ///     Creates a new instance of <see cref="ConcurrentJsonStore{T}"/> with the given options. 
+        ///     Creates a new instance of <see cref="ConcurrentJsonStore{T}" /> with the given options.
         /// </summary>
         /// <param name="options">The options for this store.</param>
         /// <param name="semaphoreFactory">The semaphore factory.</param>
@@ -32,21 +31,6 @@ namespace JsonStores.Concurrent
             return await ReadItemAsync();
         }
 
-        private async Task<T> ReadItemAsync()
-        {
-            var semaphore = _semaphoreFactory.GetSemaphore<T>();
-
-            try
-            {
-                semaphore.WaitOne();
-                return await ReadFileAsync();
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        }
-
         public async Task SaveAsync(T item)
         {
             var semaphore = _semaphoreFactory.GetSemaphore<T>();
@@ -62,9 +46,19 @@ namespace JsonStores.Concurrent
             }
         }
 
-        public void Dispose()
+        private async Task<T> ReadItemAsync()
         {
-            _semaphoreFactory.Dispose();
+            var semaphore = _semaphoreFactory.GetSemaphore<T>();
+
+            try
+            {
+                semaphore.WaitOne();
+                return await ReadFileAsync();
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
     }
 }

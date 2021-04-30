@@ -19,7 +19,7 @@ namespace JsonStores.Tests.Concurrent.Semaphores
         [Fact]
         public void SameFactory()
         {
-            using ISemaphoreFactory factory = new NamedSemaphoreFactory(_semaphoreName);
+            ISemaphoreFactory factory = new NamedSemaphoreFactory(_semaphoreName);
 
             var expected = factory.GetSemaphore<Person>();
             var actual = factory.GetSemaphore<Person>();
@@ -32,7 +32,7 @@ namespace JsonStores.Tests.Concurrent.Semaphores
         public void DiffFactories()
         {
             using var expectedSemaphore = new Semaphore(1, 1, _semaphoreName);
-            using ISemaphoreFactory factory = new NamedSemaphoreFactory(_semaphoreName);
+            ISemaphoreFactory factory = new NamedSemaphoreFactory(_semaphoreName);
 
             var createdSemaphore = factory.GetSemaphore<Person>();
             Assert.NotNull(createdSemaphore);
