@@ -2,21 +2,26 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using JsonStores.Concurrent.SemaphoreFactories;
 using JsonStores.Helpers;
 
 namespace JsonStores.Concurrent
 {
     /// <inheritdoc cref="IConcurrentJsonRepository{T,TKey}"/>
     public class ConcurrentJsonRepository<T, TKey> :
-        AbstractJsonStore<ICollection<T>>, IConcurrentJsonRepository<T, TKey>
+        AbstractJsonStore<ICollection<T>>, IConcurrentJsonRepository<T, TKey>, IDisposable
         where T : class, new() where TKey : notnull
     {
+        private readonly ISemaphoreFactory _semaphoreFactory;
+
         /// <summary>
         ///     Creates a new instance with the given options.
         /// </summary>
         /// <param name="options">The options for this repository.</param>
-        public ConcurrentJsonRepository(JsonStoreOptions options) : base(options)
+        /// <param name="semaphoreFactory">The semaphore factory.</param>
+        public ConcurrentJsonRepository(JsonStoreOptions options, ISemaphoreFactory semaphoreFactory) : base(options)
         {
+            _semaphoreFactory = semaphoreFactory;
             var keyProperty = RepositoryKeyValidator.GetKeyProperty<T, TKey>();
             GetKeyValue = keyProperty.Compile();
         }
@@ -26,8 +31,14 @@ namespace JsonStores.Concurrent
         /// </summary>
         /// <param name="options">The options for this repository.</param>
         /// <param name="keyProperty">A <see cref="Func{TResult}"/> to get the object's key.</param>
-        public ConcurrentJsonRepository(JsonStoreOptions options, Expression<Func<T, TKey>> keyProperty) : base(options)
+        /// <param name="semaphoreFactory">The semaphore factory.</param>
+        public ConcurrentJsonRepository(
+            JsonStoreOptions options,
+            Expression<Func<T, TKey>> keyProperty,
+            ISemaphoreFactory semaphoreFactory
+        ) : base(options)
         {
+            _semaphoreFactory = semaphoreFactory;
             GetKeyValue = keyProperty.Compile();
         }
 
@@ -85,5 +96,12 @@ namespace JsonStores.Concurrent
         ///     Method used to obtain an object's key value.
         /// </summary>
         private Func<T, TKey> GetKeyValue { get; }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+
+            _semaphoreFactory?.Dispose();
+        }
     }
 }

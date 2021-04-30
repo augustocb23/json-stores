@@ -1,4 +1,5 @@
 ﻿using JsonStores.Concurrent;
+using JsonStores.Concurrent.SemaphoreFactories;
 using JsonStores.Exceptions;
 using JsonStores.Tests.Models;
 using Xunit;
@@ -16,7 +17,9 @@ namespace JsonStores.Tests.Concurrent.Repositories
         {
             var options = new JsonStoreOptions();
             Assert.Throws<InvalidJsonRepositoryKeyException>(() =>
-                new ConcurrentJsonRepository<RepositoryTestModels.PersonWithoutId, int>(options));
+                new ConcurrentJsonRepository<RepositoryTestModels.PersonWithoutId, int>(
+                    options, new LocalSemaphoreFactory())
+            );
         }
     }
 }
