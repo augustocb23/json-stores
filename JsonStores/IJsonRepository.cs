@@ -45,7 +45,8 @@ namespace JsonStores
         /// </summary>
         /// <exception cref="InvalidOperationException">File was changed after last reload.</exception>
         /// <exception cref="FileChangedException">File was changed since the last reload.</exception>
-        /// <seealso cref="JsonStoreOptions.ThrowOnSavingChangedFile"/>
+        /// <seealso cref="JsonStoreOptions.ThrowOnSavingChangedFile" />
+        /// <exception cref="InvalidOperationException">The content was never loaded.</exception>
         Task SaveChangesAsync();
 
         /// <summary>

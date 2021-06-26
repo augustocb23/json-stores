@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using JsonStores.Concurrent.SemaphoreFactories;
+using JsonStores.Exceptions;
 using JsonStores.Helpers;
 
 namespace JsonStores.Concurrent
@@ -12,7 +15,7 @@ namespace JsonStores.Concurrent
         AbstractJsonStore<ICollection<T>>, IConcurrentJsonRepository<T, TKey>
         where T : class, new() where TKey : notnull
     {
-        private readonly ISemaphoreFactory _semaphoreFactory;
+        private readonly Semaphore _semaphore;
 
         /// <summary>
         ///     Creates a new instance with the given options.
@@ -21,9 +24,10 @@ namespace JsonStores.Concurrent
         /// <param name="semaphoreFactory">The semaphore factory.</param>
         public ConcurrentJsonRepository(JsonStoreOptions options, ISemaphoreFactory semaphoreFactory) : base(options)
         {
-            _semaphoreFactory = semaphoreFactory;
             var keyProperty = RepositoryKeyValidator.GetKeyProperty<T, TKey>();
             GetKeyValue = keyProperty.Compile();
+
+            _semaphore = semaphoreFactory.GetSemaphore<T>();
         }
 
         /// <summary>
@@ -38,63 +42,236 @@ namespace JsonStores.Concurrent
             ISemaphoreFactory semaphoreFactory
         ) : base(options)
         {
-            _semaphoreFactory = semaphoreFactory;
             GetKeyValue = keyProperty.Compile();
+
+            _semaphore = semaphoreFactory.GetSemaphore<T>();
         }
+
+        /// <summary>
+        ///     A collections containing the loaded data.
+        /// </summary>
+        private ICollection<T> Items { get; set; }
 
         /// <summary>
         ///     Method used to obtain an object's key value.
         /// </summary>
         private Func<T, TKey> GetKeyValue { get; }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        /// <summary>
+        ///     Load (or initialize) current content.
+        /// </summary>
+        /// <returns>Current content of the collection.</returns>
+        private async Task LoadAsync()
         {
-            throw new NotImplementedException();
+            if (FileExists) Items = await ReadFileAsync();
+            else Items = new List<T>();
         }
 
-        public async Task<T> GetByIdAsync(TKey id)
+        #region IRepository implementation (wrap operations with semaphore)
+
+        /// <inheritdoc />
+        public Task<IEnumerable<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                return GetAllOperation();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        public async Task AddAsync(T item)
+        /// <inheritdoc />
+        public Task<T> GetByIdAsync(TKey id)
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                return GetByIdOperation(id);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        public async Task UpdateAsync(T item)
+        /// <inheritdoc />
+        public Task AddAsync(T item)
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                return AddOperation(item);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        public async Task SaveChangesAsync()
+        /// <inheritdoc />
+        public Task UpdateAsync(T item)
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                return UpdateOperation(item);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        public async Task<bool> ExistsAsync(TKey id)
+        /// <inheritdoc />
+        public Task<bool> ExistsAsync(TKey id)
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                return ExistsOperation(id);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        public async Task RemoveAsync(TKey id)
+        /// <inheritdoc />
+        public Task RemoveAsync(TKey id)
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                return RemoveOperation(id);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
-        public async Task AddAndSaveAsync(T obj)
+        /// <inheritdoc />
+        public Task SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            if (Items == null)
+                throw new InvalidOperationException("Content was never loaded.");
+
+            _semaphore.WaitOne();
+            try
+            {
+                return SaveChangesOperation();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        #endregion
+
+        #region IConcurrentRepository implementation
+
+        public async Task AddAndSaveAsync(T item)
+        {
+            _semaphore.WaitOne();
+            try
+            {
+                await AddOperation(item);
+                await SaveChangesOperation();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         public async Task UpdateAndSaveAsync(T item)
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                await UpdateOperation(item);
+                await SaveChangesOperation();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         public async Task RemoveAndSaveAsync(TKey id)
         {
-            throw new NotImplementedException();
+            _semaphore.WaitOne();
+            try
+            {
+                await RemoveOperation(id);
+                await SaveChangesOperation();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
+
+        #endregion
+
+        #region Repository operations
+
+        private async Task<IEnumerable<T>> GetAllOperation()
+        {
+            if (Items == null || FileChanged) await LoadAsync();
+            return Items;
+        }
+
+        private async Task<T> GetByIdOperation(TKey id)
+        {
+            if (Items == null || FileChanged) await LoadAsync();
+            return Items.SingleOrDefault(item => id.Equals(GetKeyValue(item)));
+        }
+
+        private async Task AddOperation(T item)
+        {
+            if (await ExistsOperation(GetKeyValue(item)))
+                throw new UniquenessConstraintViolationException(item, GetKeyValue(item));
+
+            Items.Add(item);
+        }
+
+        private async Task UpdateOperation(T item)
+        {
+            if (Items == null || FileChanged) await LoadAsync();
+
+            await RemoveOperation(GetKeyValue(item));
+            await AddOperation(item);
+        }
+
+        private async Task<bool> ExistsOperation(TKey id)
+        {
+            if (Items == null || FileChanged) await LoadAsync();
+
+            return Items.Any(item => id.Equals(GetKeyValue(item)));
+        }
+
+        private async Task RemoveOperation(TKey id)
+        {
+            if (Items == null || FileChanged) await LoadAsync();
+
+            var obj = Items.SingleOrDefault(item => id.Equals(GetKeyValue(item)));
+            if (obj == null) throw new ItemNotFoundException(id);
+
+            Items.Remove(obj);
+        }
+
+        private async Task SaveChangesOperation()
+        {
+            // don't need to check for null if is using IConcurrentRepository methods
+
+            await SaveToFileAsync(Items);
+        }
+
+        #endregion
     }
 }

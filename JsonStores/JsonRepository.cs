@@ -9,7 +9,7 @@ using JsonStores.Helpers;
 
 namespace JsonStores
 {
-    /// <inheritdoc cref="IJsonRepository{T,TKey}"/>
+    /// <inheritdoc cref="IJsonRepository{T,TKey}" />
     public class JsonRepository<T, TKey> : AbstractJsonStore<ICollection<T>>, IJsonRepository<T, TKey> where T : class
         where TKey : notnull
     {
@@ -27,11 +27,21 @@ namespace JsonStores
         ///     Creates a new instance with the given options and key.
         /// </summary>
         /// <param name="options">The options for this repository.</param>
-        /// <param name="keyProperty">A <see cref="Func{T,TKey}"/> to get the object's key.</param>
+        /// <param name="keyProperty">A <see cref="Func{T,TResult}" /> to get the object's key.</param>
         public JsonRepository(JsonStoreOptions options, Expression<Func<T, TKey>> keyProperty) : base(options)
         {
             GetKeyValue = keyProperty.Compile();
         }
+
+        /// <summary>
+        ///     A collections containing the loaded data.
+        /// </summary>
+        private ICollection<T> Items { get; set; }
+
+        /// <summary>
+        ///     Method used to obtain an object's key value.
+        /// </summary>
+        private Func<T, TKey> GetKeyValue { get; }
 
         /// <inheritdoc />
         public virtual async Task<IEnumerable<T>> GetAllAsync()
@@ -66,16 +76,6 @@ namespace JsonStores
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">The content was never loaded.</exception>
-        public virtual async Task SaveChangesAsync()
-        {
-            if (Items == null)
-                throw new InvalidOperationException("Content was never loaded.");
-
-            await SaveToFileAsync(Items);
-        }
-
-        /// <inheritdoc />
         public virtual async Task<bool> ExistsAsync([NotNull] TKey id)
         {
             if (Items == null || FileChanged) await LoadAsync();
@@ -94,6 +94,15 @@ namespace JsonStores
             Items.Remove(obj);
         }
 
+        /// <inheritdoc />
+        public virtual async Task SaveChangesAsync()
+        {
+            if (Items == null)
+                throw new InvalidOperationException("Content was never loaded.");
+
+            await SaveToFileAsync(Items);
+        }
+
         /// <summary>
         ///     Load (or initialize) current content.
         /// </summary>
@@ -103,15 +112,5 @@ namespace JsonStores
             if (FileExists) Items = await ReadFileAsync();
             else Items = new List<T>();
         }
-
-        /// <summary>
-        ///     A collections containing the loaded data.
-        /// </summary>
-        private ICollection<T> Items { get; set; }
-
-        /// <summary>
-        ///     Method used to obtain an object's key value.
-        /// </summary>
-        private Func<T, TKey> GetKeyValue { get; }
     }
 }

@@ -2,26 +2,22 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using JsonStores.Concurrent;
-using JsonStores.Concurrent.SemaphoreFactories;
 using JsonStores.Exceptions;
 using JsonStores.NamingStrategies;
 using JsonStores.Tests.Models;
 using Xunit;
 
-namespace JsonStores.Tests.Concurrent.Repositories
+namespace JsonStores.Tests.Repositories
 {
-    public class RepositoryCrudOperations : IDisposable
+    public abstract class AbstractJsonRepositoryTest<T> : IDisposable where T : IJsonRepository<Person, int>
     {
         private readonly JsonStoreOptions _options;
         private readonly string _path;
-        private readonly ISemaphoreFactory _semaphoreFactory;
 
-        public RepositoryCrudOperations()
+        protected AbstractJsonRepositoryTest()
         {
             _path = Guid.NewGuid().ToString("N");
             _options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)};
-            _semaphoreFactory = new LocalSemaphoreFactory();
 
             // create a file with an item
             var filePath = Path.Combine(_options.Location, $"{_path}.json");
@@ -35,13 +31,14 @@ namespace JsonStores.Tests.Concurrent.Repositories
             File.Delete(_path);
         }
 
+        protected abstract T GetStore(JsonStoreOptions options);
+
         [Theory]
         [InlineData(1, true)]
         [InlineData(999, false)]
         public async Task Exists(int id, bool expected)
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             var idExists = await store.ExistsAsync(id);
             Assert.Equal(expected, idExists);
@@ -52,8 +49,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [InlineData(999, null)]
         public async Task GetById(int id, string expectedName)
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             var person = await store.GetByIdAsync(id);
             Assert.Equal(expectedName, person?.FullName);
@@ -62,8 +58,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task GetAll()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             var persons = await store.GetAllAsync();
 
@@ -73,15 +68,14 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task Add_Success()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             var person2 = Constants.GetPerson2();
             await store.AddAsync(person2);
             await store.SaveChangesAsync();
 
             // use another repository (without any cache) to load the saved item
-            var newRepository = new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            var newRepository = GetStore(_options);
             var items = (await newRepository.GetAllAsync()).ToList();
 
             Assert.Contains(person2, items);
@@ -91,8 +85,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task Add_IdViolation()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             await Assert.ThrowsAsync<UniquenessConstraintViolationException>(
                 () => store.AddAsync(Constants.GetPerson()));
@@ -101,8 +94,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task Update_NotExisting()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
             var notExistingItem = new Person {Id = 999, FullName = "Nobody"};
 
             await Assert.ThrowsAsync<ItemNotFoundException>(async () => await store.UpdateAsync(notExistingItem));
@@ -111,8 +103,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task Update_Success()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
             var person = Constants.GetPerson();
             person.FullName = Guid.NewGuid().ToString();
 
@@ -120,8 +111,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
             await store.SaveChangesAsync();
 
             // reloads the item
-            IConcurrentJsonRepository<Person, int> newStore =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> newStore = GetStore(_options);
             var newPerson = await newStore.GetByIdAsync(person.Id);
 
             Assert.Equal(person, newPerson);
@@ -130,8 +120,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task Remove_NotExisting()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             await Assert.ThrowsAsync<ItemNotFoundException>(async () => await store.RemoveAsync(999));
         }
@@ -139,14 +128,12 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task Remove_Success()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             await store.RemoveAsync(1);
             await store.SaveChangesAsync();
 
-            IConcurrentJsonRepository<Person, int> newStore =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> newStore = GetStore(_options);
             var items = await newStore.GetAllAsync();
             Assert.Empty(items);
         }
@@ -154,8 +141,7 @@ namespace JsonStores.Tests.Concurrent.Repositories
         [Fact]
         public async Task SavingEmptyList()
         {
-            IConcurrentJsonRepository<Person, int> store =
-                new ConcurrentJsonRepository<Person, int>(_options, _semaphoreFactory);
+            IJsonRepository<Person, int> store = GetStore(_options);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await store.SaveChangesAsync());
         }
