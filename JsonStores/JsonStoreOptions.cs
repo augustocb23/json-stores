@@ -57,5 +57,15 @@ namespace JsonStores
         {
             return Path.Combine(Location, $"{NamingStrategy.GetName<T>()}.{FileExtension}");
         }
+
+        /// <summary>
+        ///     Gets full path to the file for specified file name.
+        /// </summary>
+        /// <param name="fileName">The name to the file.</param>
+        /// <returns>Full path to the file.</returns>
+        public string GetFileFullPath(string fileName)
+        {
+            return Path.Combine(Location, $"{fileName}.{FileExtension}");
+        }
     }
 }

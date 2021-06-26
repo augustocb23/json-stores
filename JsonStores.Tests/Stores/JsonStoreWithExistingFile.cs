@@ -23,8 +23,7 @@ namespace JsonStores.Tests.Stores
             {
                 NamingStrategy = new StaticNamingStrategy(_fileName)
             };
-            var filePath = Path.Combine(options.Location, $"{_fileName}.json");
-            JsonFileCreator.CreateStore(filePath);
+            JsonFileCreator.CreateStore(options.GetFileFullPath(_fileName));
 
             _store = new JsonStore<Person>(options);
         }
