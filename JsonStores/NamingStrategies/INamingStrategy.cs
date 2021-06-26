@@ -1,4 +1,6 @@
-﻿namespace JsonStores.NamingStrategies
+﻿using System;
+
+namespace JsonStores.NamingStrategies
 {
     /// <summary>
     ///     The strategy used to get the file name.

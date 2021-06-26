@@ -1,0 +1,38 @@
+﻿using System;
+using JsonStores.Concurrent.SemaphoreFactories;
+using JsonStores.Tests.Models;
+using Xunit;
+
+namespace JsonStores.Tests.Concurrent.Semaphores
+{
+    public class LocalSemaphore
+    {
+        [Fact]
+        public void SameType()
+        {
+            var expected = new LocalSemaphoreFactory().GetSemaphore<Person>();
+            var actual = new LocalSemaphoreFactory().GetSemaphore<Person>();
+
+            Assert.NotNull(expected);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(typeof(int))]
+        [InlineData(typeof(string))]
+        [InlineData(typeof(Person))]
+        public void DiffType(Type type)
+        {
+            // gets the generic method using reflection
+            var method = typeof(ISemaphoreFactory).GetMethod(nameof(ISemaphoreFactory.GetSemaphore))?
+                .MakeGenericMethod(type);
+            Assert.NotNull(method);
+
+            var expected = new LocalSemaphoreFactory().GetSemaphore<int>();
+            var actual = method.Invoke(new LocalSemaphoreFactory(), null);
+
+            Assert.NotNull(expected);
+            Assert.Equal(expected, actual);
+        }
+    }
+}

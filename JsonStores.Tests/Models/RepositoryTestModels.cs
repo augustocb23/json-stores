@@ -1,6 +1,6 @@
 ﻿using JsonStores.Annotations;
 
-namespace JsonStores.Tests.Repositories
+namespace JsonStores.Tests.Models
 {
     public static class RepositoryTestModels
     {
