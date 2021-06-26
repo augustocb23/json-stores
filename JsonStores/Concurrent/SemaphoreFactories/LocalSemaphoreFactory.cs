@@ -8,11 +8,11 @@ namespace JsonStores.Concurrent.SemaphoreFactories
     /// </summary>
     public class LocalSemaphoreFactory : ISemaphoreFactory
     {
-        private Semaphore _semaphore;
+        private static Semaphore _semaphore;
 
         /// <inheritdoc />
         /// <summary>
-        ///     Gets a singleton semaphore instance. The <typeparamref name="T"/> param is ignored.
+        ///     Gets a singleton semaphore instance. The <typeparamref name="T" /> param is ignored.
         /// </summary>
         public Semaphore GetSemaphore<T>()
         {
