@@ -1,6 +1,6 @@
 ﻿# JsonStores
 
-[![GitHub](https://img.shields.io/github/license/augustocb23/json-stores)](LICENSE) [![Nuget](https://img.shields.io/nuget/v/JsonStores)](https://www.nuget.org/packages/JsonStores) [![Nuget](https://img.shields.io/nuget/dt/JsonStores)](https://www.nuget.org/packages/JsonStores)
+[![GitHub](https://img.shields.io/github/license/augustocb23/json-stores)](LICENSE) [![Nuget](https://img.shields.io/nuget/v/JsonStores)](https://www.nuget.org/packages/JsonStores) [![Nuget](https://img.shields.io/nuget/dt/JsonStores)](https://www.nuget.org/packages/JsonStores) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/augustocb23/json-stores/.NET)](https://github.com/augustocb23/json-stores/actions/workflows/dotnet.yml)
 
 Persist your data on JSON files in an easy and flexible way
 
@@ -18,7 +18,8 @@ Install the package from [Nuget](https://www.nuget.org/packages/JsonStores)
     dotnet add package JsonStores
 ```
 
-Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) using `AddJsonStores()` extension method
+Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection)
+using `AddJsonStores()` extension method
 
 ```csharp
     public void ConfigureServices(IServiceCollection services)
@@ -95,9 +96,11 @@ Use the class `JsonStoreOptions` to customize
 
 ## Create your JSON repository
 
-In order to instantiate the repository, you must specify a property as an unique key. The second generic parameter must match the type of this property.
+In order to instantiate the repository, you must specify a property as an unique key. The second generic parameter must
+match the type of this property.
 
-- If your class has an Id property, it will be used. You can change this behavior by adding the `IgnoreIdProperty` annotation to your class.
+- If your class has an Id property, it will be used. You can change this behavior by adding the `IgnoreIdProperty`
+  annotation to your class.
 - To use another property, add the `JsonRepositoryKey` annotation on any property of your class.
 
 If your are manually instantiating your class, you can pass an expression in the constructor:

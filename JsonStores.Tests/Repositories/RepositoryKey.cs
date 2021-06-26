@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using JsonStores.Exceptions;
 using JsonStores.NamingStrategies;
+using JsonStores.Tests.Helpers;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -10,11 +11,11 @@ namespace JsonStores.Tests.Repositories
 {
     public class RepositoryKey : IDisposable
     {
-        private readonly string _path;
+        private readonly string _fileName;
 
         public RepositoryKey()
         {
-            _path = Guid.NewGuid().ToString("N");
+            _fileName = Guid.NewGuid().ToString("N");
         }
 
         [Fact]
@@ -45,7 +46,7 @@ namespace JsonStores.Tests.Repositories
         {
             IJsonRepository<RepositoryTestModels.PersonIdWithAttribute, int> GetRepository() =>
                 new JsonRepository<RepositoryTestModels.PersonIdWithAttribute, int>(new JsonStoreOptions
-                    {NamingStrategy = new StaticNamingStrategy(_path)});
+                    {NamingStrategy = new StaticNamingStrategy(_fileName)});
 
             var repository = GetRepository();
 
@@ -68,7 +69,7 @@ namespace JsonStores.Tests.Repositories
         {
             IJsonRepository<RepositoryTestModels.PersonWithoutId, int> GetRepository() =>
                 new JsonRepository<RepositoryTestModels.PersonWithoutId, int>(
-                    new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_path)},
+                    new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy(_fileName)},
                     person => person.Number);
 
             // add an item
@@ -89,7 +90,7 @@ namespace JsonStores.Tests.Repositories
         {
             GC.SuppressFinalize(this);
 
-            if (_path != null) File.Delete(_path);
+            if (_fileName != null) File.Delete(FilePathEvaluator.GetFilePath(_fileName));
         }
     }
 }

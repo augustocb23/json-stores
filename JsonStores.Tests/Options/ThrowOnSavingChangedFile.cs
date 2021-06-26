@@ -58,7 +58,6 @@ namespace JsonStores.Tests.Options
             var newPerson = Constants.GetPerson();
             newPerson.FullName = Guid.NewGuid().ToString("N");
 
-            // wait to ensure the time will be different
             await Assert.ThrowsAsync<FileChangedException>(() => store.SaveAsync(newPerson));
         }
 

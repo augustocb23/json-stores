@@ -55,7 +55,7 @@ namespace JsonStores
         /// <summary>
         ///     Full file path to the file.
         /// </summary>
-        private string FileFullPath => _options.GetFileFullPath(FileName);
+        private string FileFullPath => Path.Combine(_options.Location, $"{FileName}.{_options.FileExtension}");
 
         /// <summary>
         ///     The name of the file to persist the data, without the extension.
@@ -72,9 +72,14 @@ namespace JsonStores
         protected async Task SaveToFileAsync(T content)
         {
             // if the object was previously loaded, check for changes
-            if (_options.ThrowOnSavingChangedFile &&
-                LastUpdate != DateTime.MinValue && FileChanged)
-                throw new FileChangedException(FileFullPath);
+            if (_options.ThrowOnSavingChangedFile)
+            {
+                // wait to ensure the time (ticks) will be different
+                await Task.Delay(10);
+
+                if (LastUpdate != DateTime.MinValue && FileChanged)
+                    throw new FileChangedException(FileFullPath);
+            }
 
             Directory.CreateDirectory(GetFileInfo().DirectoryName!);
 

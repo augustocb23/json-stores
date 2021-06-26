@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using JsonStores.NamingStrategies;
+using JsonStores.Tests.Helpers;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace JsonStores.Tests.Options
         public async Task StaticName()
         {
             var options = new JsonStoreOptions {NamingStrategy = new StaticNamingStrategy("static-file-name")};
-            _path = $@"{options.Location}\static-file-name.{options.FileExtension}";
+            _path = FilePathEvaluator.GetFilePath("static-file-name");
             var store = new JsonStore<Person>(options);
 
             await store.SaveAsync(_person);
@@ -33,7 +34,7 @@ namespace JsonStores.Tests.Options
         public async Task ClassName()
         {
             var options = new JsonStoreOptions();
-            _path = $@"{options.Location}\{nameof(Person)}.{options.FileExtension}";
+            _path = FilePathEvaluator.GetFilePath(nameof(Person));
             var store = new JsonStore<Person>(options);
 
             await store.SaveAsync(_person);
@@ -45,7 +46,7 @@ namespace JsonStores.Tests.Options
         public async Task ClassName_WithGenerics()
         {
             var options = new JsonStoreOptions();
-            _path = $@"{options.Location}\{nameof(Person)}.{options.FileExtension}";
+            _path = FilePathEvaluator.GetFilePath(nameof(Person));
             var store = new JsonRepository<Person, int>(options);
 
             await store.AddAsync(_person);
