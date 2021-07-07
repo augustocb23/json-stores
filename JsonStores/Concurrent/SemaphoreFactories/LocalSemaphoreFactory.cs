@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 
 namespace JsonStores.Concurrent.SemaphoreFactories
 {
@@ -8,7 +7,7 @@ namespace JsonStores.Concurrent.SemaphoreFactories
     /// </summary>
     public class LocalSemaphoreFactory : ISemaphoreFactory
     {
-        private static Semaphore _semaphore;
+        private Semaphore _semaphore;
 
         /// <inheritdoc />
         /// <summary>
@@ -17,13 +16,6 @@ namespace JsonStores.Concurrent.SemaphoreFactories
         public Semaphore GetSemaphore<T>()
         {
             return _semaphore ??= new Semaphore(1, 1);
-        }
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-
-            _semaphore?.Dispose();
         }
     }
 }

@@ -7,11 +7,18 @@ namespace JsonStores.Tests.Concurrent.Semaphores
 {
     public class LocalSemaphore
     {
+        private readonly ISemaphoreFactory _factory;
+
+        public LocalSemaphore()
+        {
+            _factory = new LocalSemaphoreFactory();
+        }
+
         [Fact]
         public void SameType()
         {
-            var expected = new LocalSemaphoreFactory().GetSemaphore<Person>();
-            var actual = new LocalSemaphoreFactory().GetSemaphore<Person>();
+            var expected = _factory.GetSemaphore<Person>();
+            var actual = _factory.GetSemaphore<Person>();
 
             Assert.NotNull(expected);
             Assert.Equal(expected, actual);
@@ -28,8 +35,8 @@ namespace JsonStores.Tests.Concurrent.Semaphores
                 .MakeGenericMethod(type);
             Assert.NotNull(method);
 
-            var expected = new LocalSemaphoreFactory().GetSemaphore<int>();
-            var actual = method.Invoke(new LocalSemaphoreFactory(), null);
+            var expected = _factory.GetSemaphore<int>();
+            var actual = method.Invoke(_factory, null);
 
             Assert.NotNull(expected);
             Assert.Equal(expected, actual);
