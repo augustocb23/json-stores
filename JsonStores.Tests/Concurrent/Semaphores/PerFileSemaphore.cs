@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using JsonStores.Concurrent.SemaphoreFactories;
+using JsonStores.Tests.Helpers;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace JsonStores.Tests.Concurrent.Semaphores
             _factory = new PerFileSemaphoreFactory(_options);
         }
 
-        [Fact]
+        [WindowsOnlyFact]
         public void SameFactory()
         {
             var semaphore1 = _factory.GetSemaphore<Person>();
@@ -34,7 +35,7 @@ namespace JsonStores.Tests.Concurrent.Semaphores
         }
 
 
-        [Fact]
+        [WindowsOnlyFact]
         public void DiffFactory()
         {
             var semaphore1 = _factory.GetSemaphore<Person>();
@@ -51,7 +52,7 @@ namespace JsonStores.Tests.Concurrent.Semaphores
             Assert.True(released);
         }
 
-        [Fact]
+        [WindowsOnlyFact]
         public void DiffFiles()
         {
             var personSemaphore = _factory.GetSemaphore<Person>();

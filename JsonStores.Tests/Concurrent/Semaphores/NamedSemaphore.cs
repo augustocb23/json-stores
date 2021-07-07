@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using JsonStores.Concurrent.SemaphoreFactories;
+using JsonStores.Tests.Helpers;
 using JsonStores.Tests.Models;
 using Xunit;
 
@@ -16,7 +17,7 @@ namespace JsonStores.Tests.Concurrent.Semaphores
             _semaphoreName = Guid.NewGuid().ToString();
         }
 
-        [Fact]
+        [WindowsOnlyFact]
         public void SameFactory()
         {
             ISemaphoreFactory factory = new NamedSemaphoreFactory(_semaphoreName);
@@ -28,7 +29,7 @@ namespace JsonStores.Tests.Concurrent.Semaphores
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
+        [WindowsOnlyFact]
         public void DiffFactories()
         {
             using var expectedSemaphore = new Semaphore(1, 1, _semaphoreName);

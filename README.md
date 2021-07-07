@@ -153,6 +153,8 @@ There are three built-in implementations:
   entire SO.
 - `PerFileSemaphoreFactory` returns a named semaphore based on a given `IJsonStoreOptions`.
 
+> Named semaphores are only available on Windows machines. See [this issue](https://github.com/dotnet/runtime/issues/4370) for details.
+
 #### Custom factory
 
 To implement your own factory, just return a binary (from 1 to 1) Semaphore object.

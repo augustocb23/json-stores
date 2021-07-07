@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace JsonStores.Concurrent.SemaphoreFactories
@@ -8,6 +10,7 @@ namespace JsonStores.Concurrent.SemaphoreFactories
     /// <summary>
     ///     Uses the file path to create a system-wide semaphore.
     /// </summary>
+    /// <remarks>This class is only available on Windows.</remarks>
     public class PerFileSemaphoreFactory : ISemaphoreFactory
     {
         private const string DefaultSemaphorePrefix = "cb96cc39-d2a6-4190-9119-7aaaebfa4443";
@@ -19,28 +22,33 @@ namespace JsonStores.Concurrent.SemaphoreFactories
         /// <summary>
         ///     Creates a new instance using the default semaphore name prefix and default options.
         /// </summary>
-        /// <seealso cref="JsonStoreOptions"/>
+        /// <seealso cref="JsonStoreOptions" />
         public PerFileSemaphoreFactory() : this(new JsonStoreOptions())
         {
+            ThrowIfIsNotWindows();
         }
 
         /// <summary>
-        ///     Creates a new instance using the default semaphore name prefix and the specified <see cref="JsonStoreOptions"/>.
+        ///     Creates a new instance using the default semaphore name prefix and the specified <see cref="JsonStoreOptions" />.
         /// </summary>
         /// <param name="options">The options used to retrieve the file name.</param>
         public PerFileSemaphoreFactory(JsonStoreOptions options)
         {
+            ThrowIfIsNotWindows();
+
             _options = options;
             _semaphorePrefix = DefaultSemaphorePrefix;
         }
 
         /// <summary>
-        ///     Creates a new instance specifying the options and the prefix to be used on named semaphores. 
+        ///     Creates a new instance specifying the options and the prefix to be used on named semaphores.
         /// </summary>
         /// <param name="options">The options used to retrieve the file name.</param>
         /// <param name="semaphorePrefix">The prefix to be used on named semaphores.</param>
         public PerFileSemaphoreFactory(JsonStoreOptions options, string semaphorePrefix)
         {
+            ThrowIfIsNotWindows();
+
             _options = options;
             _semaphorePrefix = semaphorePrefix;
         }
@@ -67,6 +75,13 @@ namespace JsonStores.Concurrent.SemaphoreFactories
 
             foreach (var semaphore in _semaphores.Values)
                 semaphore.Dispose();
+        }
+
+        private static void ThrowIfIsNotWindows()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                throw new PlatformNotSupportedException(
+                    $"'{nameof(PerFileSemaphoreFactory)}' is only available on Windows.");
         }
     }
 }
