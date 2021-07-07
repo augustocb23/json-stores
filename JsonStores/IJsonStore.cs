@@ -2,6 +2,10 @@
 
 namespace JsonStores
 {
+    /// <summary>
+    ///     Represents a store to persist a single item.
+    /// </summary>
+    /// <typeparam name="T">The type for the item to be persisted.</typeparam>
     public interface IJsonStore<T> where T : class, new()
     {
         /// <summary>

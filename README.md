@@ -2,12 +2,13 @@
 
 [![GitHub](https://img.shields.io/github/license/augustocb23/json-stores)](LICENSE) [![Nuget](https://img.shields.io/nuget/v/JsonStores)](https://www.nuget.org/packages/JsonStores) [![Nuget](https://img.shields.io/nuget/dt/JsonStores)](https://www.nuget.org/packages/JsonStores) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/augustocb23/json-stores/.NET)](https://github.com/augustocb23/json-stores/actions/workflows/dotnet.yml)
 
-Persist your data on JSON files in an easy and flexible way. You can create an simple store, or a repository that
-encapsulates a collection of items.
+Persist your data on JSON files in an easy and flexible way
 
-Developed on top
-of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-overview) and
-compatible with `netstandard2.1`.
+- Create stores (containing a single object) or repositories (containing a collection of items)
+- Thread-safe overloads ([see docs](#Concurrent-stores))
+- Developed on top
+  of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-overview) and
+  compatible with `netstandard2.1`
 
 ## Getting started
 
@@ -111,7 +112,7 @@ If your are manually instantiating your class, you can pass an expression in the
 
 An `InvalidJsonRepositoryKeyException` will be thrown if:
 
-- Your class don't have an Id or any property with the `JsonRepositoryKey` annotation.
+- Your class don't have an `Id` or any property with the `JsonRepositoryKey` annotation.
 - There is more than one property with the `JsonRepositoryKey` annotation.
 - The property type don't match the second generic parameter.
 
@@ -132,7 +133,52 @@ You can also customize the behavior of your stores just extending `JsonStore` an
     }
 ```
 
-See the `NoteStore` class on sample app for details.
+See the `NoteStore` class on [sample app](#Sample-app) for details.
+
+## Concurrent stores
+
+The `Concurrent` namespace contains the thread-safe overloads: `ConcurrentJsonStore` and `ConcurrentJsonRepository`.
+
+### Semaphore factories
+
+In addition to the default parameters, you'll need to provide a `ISemaphoreFactory`. A
+binary [Semaphore](https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphore) is obtained based on the type
+of the store (the `T` parameter) and used to control who can access the store.
+
+There are three built-in implementations:
+
+- `LocalSemaphoreFactory` returns the same (singleton) semaphore. This lightweight instance may not work properly on a
+  multi-instance app.
+- `NamedSemaphoreFactory` returns a named (system-wide) semaphore with the given string. This will be available for the
+  entire SO.
+- `PerFileSemaphoreFactory` returns a named semaphore based on a given `IJsonStoreOptions`.
+
+> Named semaphores are only available on Windows machines. See [this issue](https://github.com/dotnet/runtime/issues/4370) for details.
+
+#### Custom factory
+
+To implement your own factory, just return a binary (from 1 to 1) Semaphore object.
+
+```csharp
+    public class CustomFactory : ISemaphoreFactory
+    {
+        public Semaphore GetSemaphore<T>()
+        {
+            if (typeof(T) == typeof(string))
+                return new Semaphore(1, 1, "my-string-semaphore");
+            if (typeof(T) == typeof(int))
+                return new Semaphore(1, 1, "my-int-semaphore");
+
+            throw new ApplicationException($"Invalid type: '{typeof(T).Name}'.");
+        }
+    }
+```
+
+### Additional repository methods
+
+`ConcurrentJsonRepository` class contains methods to edit and save the store as a single operation. If you are
+implementing a multi-instance app (or using multiple repositories instances), use there methods to avoid
+a `FileChangedException`.
 
 ## Sample app
 
