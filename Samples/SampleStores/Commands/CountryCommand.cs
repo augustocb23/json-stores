@@ -2,10 +2,10 @@
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 using JsonStores.Exceptions;
-using JsonStores.Sample.Models;
+using JsonStores.Samples.SampleStores.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace JsonStores.Sample.Commands
+namespace JsonStores.Samples.SampleStores.Commands
 {
     public static class CountryCommand
     {

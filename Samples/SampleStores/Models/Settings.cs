@@ -1,4 +1,4 @@
-﻿namespace JsonStores.Sample.Models
+﻿namespace JsonStores.Samples.SampleStores.Models
 {
     public class Settings
     {

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
-using JsonStores.Sample.Models;
+using JsonStores.Samples.SampleStores.Models;
 
-namespace JsonStores.Sample.CustomStores
+namespace JsonStores.Samples.SampleStores.CustomStores
 {
     public class NoteStore : JsonRepository<Note, Guid>
     {
-        // specify the file (ignore NamingStrategy option) 
-        protected override string FileName => "notes";
-
         public NoteStore() : base(new JsonStoreOptions {Location = @"D:\notes"})
         {
         }
+
+        // specify the file (ignore NamingStrategy option) 
+        protected override string FileName => "notes";
 
         public override Task AddAsync(Note obj)
         {

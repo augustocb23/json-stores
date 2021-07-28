@@ -6,9 +6,7 @@ Persist your data on JSON files in an easy and flexible way
 
 - Create stores (containing a single object) or repositories (containing a collection of items)
 - Thread-safe overloads ([see docs](#Concurrent-stores))
-- Developed on top
-  of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-overview) and
-  compatible with `netstandard2.1`
+- Developed on top of [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-overview) and compatible with `netstandard2.1`
 
 ## Getting started
 
@@ -18,8 +16,7 @@ Install the package from [Nuget](https://www.nuget.org/packages/JsonStores)
     dotnet add package JsonStores
 ```
 
-Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection)
-using `AddJsonStores()` extension method
+Just add it to your [DI container](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection) using `AddJsonStores()` extension method
 
 ```csharp
     public void ConfigureServices(IServiceCollection services)
@@ -133,7 +130,7 @@ You can also customize the behavior of your stores just extending `JsonStore` an
     }
 ```
 
-See the `NoteStore` class on [sample app](#Sample-app) for details.
+See the `NoteStore` class on [sample app](#Sample-apps) for details.
 
 ## Concurrent stores
 
@@ -141,16 +138,12 @@ The `Concurrent` namespace contains the thread-safe overloads: `ConcurrentJsonSt
 
 ### Semaphore factories
 
-In addition to the default parameters, you'll need to provide a `ISemaphoreFactory`. A
-binary [Semaphore](https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphore) is obtained based on the type
-of the store (the `T` parameter) and used to control who can access the store.
+In addition to the default parameters, you'll need to provide a `ISemaphoreFactory`. A binary [Semaphore](https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphore) is obtained based on the type of the store (the `T` parameter) and used to control who can access the store.
 
 There are three built-in implementations:
 
-- `LocalSemaphoreFactory` returns the same (singleton) semaphore. This lightweight instance may not work properly on a
-  multi-instance app.
-- `NamedSemaphoreFactory` returns a named (system-wide) semaphore with the given string. This will be available for the
-  entire SO.
+- `LocalSemaphoreFactory` returns the same (singleton) semaphore. This lightweight instance may not work properly on a multi-instance app.
+- `NamedSemaphoreFactory` returns a named (system-wide) semaphore with the given string. This will be available for the entire SO.
 - `PerFileSemaphoreFactory` returns a named semaphore based on a given `IJsonStoreOptions`.
 
 > Named semaphores are only available on Windows machines. See [this issue](https://github.com/dotnet/runtime/issues/4370) for details.
@@ -176,11 +169,8 @@ To implement your own factory, just return a binary (from 1 to 1) Semaphore obje
 
 ### Additional repository methods
 
-`ConcurrentJsonRepository` class contains methods to edit and save the store as a single operation. If you are
-implementing a multi-instance app (or using multiple repositories instances), use there methods to avoid
-a `FileChangedException`.
+`ConcurrentJsonRepository` class contains methods to edit and save the store as a single operation. If you are implementing a multi-instance app (or using multiple repositories instances), use there methods to avoid a `FileChangedException`.
 
-## Sample app
+## Sample apps
 
-You can see the usage of both `JsonStore` and `JsonRepository` with the CLI app
-on [JsonStores.Sample](https://github.com/augustocb23/json-stores/tree/master/JsonStores.Sample) project.
+You can see the usage of both `JsonStore` and `JsonRepository` with the apps on [Samples](Samples/README.md) folder.

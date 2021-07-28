@@ -3,10 +3,10 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 using JsonStores.Exceptions;
-using JsonStores.Sample.CustomStores;
-using JsonStores.Sample.Models;
+using JsonStores.Samples.SampleStores.CustomStores;
+using JsonStores.Samples.SampleStores.Models;
 
-namespace JsonStores.Sample.Commands
+namespace JsonStores.Samples.SampleStores.Commands
 {
     public static class NoteCommand
     {
@@ -70,7 +70,7 @@ namespace JsonStores.Sample.Commands
             var c = new Command("edit", "Edits the description for a note")
             {
                 new Argument<Guid>("id", "Id for the note"),
-                new Argument<string>("description", "New description for the note"),
+                new Argument<string>("description", "New description for the note")
             };
 
             c.Handler = CommandHandler.Create(async (Guid id, string description) =>
