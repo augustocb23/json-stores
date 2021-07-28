@@ -1,4 +1,6 @@
-# Sample Stores App
+# Sample Stores
+
+[Home](../../README.md) / [Samples](../README.md)
 
 Basic usage using [System.CommandLine](https://github.com/dotnet/command-line-api) API
 

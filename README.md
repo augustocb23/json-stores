@@ -130,7 +130,7 @@ You can also customize the behavior of your stores just extending `JsonStore` an
     }
 ```
 
-See the `NoteStore` class on [sample app](#Sample-app) for details.
+See the `NoteStore` class on [sample app](#Sample-apps) for details.
 
 ## Concurrent stores
 
@@ -171,6 +171,6 @@ To implement your own factory, just return a binary (from 1 to 1) Semaphore obje
 
 `ConcurrentJsonRepository` class contains methods to edit and save the store as a single operation. If you are implementing a multi-instance app (or using multiple repositories instances), use there methods to avoid a `FileChangedException`.
 
-## Sample app
+## Sample apps
 
-You can see the usage of both `JsonStore` and `JsonRepository` with the CLI app on [JsonStores.Sample](https://github.com/augustocb23/json-stores/tree/master/JsonStores.Sample) project.
+You can see the usage of both `JsonStore` and `JsonRepository` with the apps on [Samples](Samples/README.md) folder.

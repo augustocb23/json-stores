@@ -1,5 +1,7 @@
 ﻿# Random JSON Creator
 
+[Home](../../README.md) / [Samples](../README.md)
+
 A console app to generate JSON files with random (GUID) data.
 
 ## Parameters
