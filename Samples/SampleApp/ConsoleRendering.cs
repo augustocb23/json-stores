@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JsonStores.Sample
+namespace JsonStores.Samples.SampleApp
 {
     public static class ConsoleRendering
     {

@@ -1,9 +1,9 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
-using JsonStores.Sample.Commands;
+using JsonStores.Samples.SampleApp.Commands;
 
-namespace JsonStores.Sample
+namespace JsonStores.Samples.SampleApp
 {
     internal static class Program
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JsonStores.Sample.Models
+namespace JsonStores.Samples.SampleApp.Models
 {
     public class Note
     {

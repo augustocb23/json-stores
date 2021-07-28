@@ -3,10 +3,10 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Linq;
 using System.Reflection;
-using JsonStores.Sample.Models;
+using JsonStores.Samples.SampleApp.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace JsonStores.Sample.Commands
+namespace JsonStores.Samples.SampleApp.Commands
 {
     public static class ConfigCommand
     {
