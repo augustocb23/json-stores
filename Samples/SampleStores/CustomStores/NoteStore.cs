@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using JsonStores.Samples.SampleApp.Models;
+using JsonStores.Samples.SampleStores.Models;
 
-namespace JsonStores.Samples.SampleApp.CustomStores
+namespace JsonStores.Samples.SampleStores.CustomStores
 {
     public class NoteStore : JsonRepository<Note, Guid>
     {

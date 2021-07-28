@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <AssemblyName>sample</AssemblyName>
+        <AssemblyName>samples</AssemblyName>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 

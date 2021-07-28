@@ -3,10 +3,10 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 using JsonStores.Exceptions;
-using JsonStores.Samples.SampleApp.CustomStores;
-using JsonStores.Samples.SampleApp.Models;
+using JsonStores.Samples.SampleStores.CustomStores;
+using JsonStores.Samples.SampleStores.Models;
 
-namespace JsonStores.Samples.SampleApp.Commands
+namespace JsonStores.Samples.SampleStores.Commands
 {
     public static class NoteCommand
     {

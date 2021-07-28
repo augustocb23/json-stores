@@ -4,7 +4,7 @@ using System.CommandLine.Rendering.Views;
 using System.Linq;
 using System.Reflection;
 
-namespace JsonStores.Samples.SampleApp
+namespace JsonStores.Samples.SampleStores
 {
     public sealed class ListView<T> : StackLayoutView where T : class, new()
     {

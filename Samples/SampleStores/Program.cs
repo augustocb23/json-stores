@@ -1,15 +1,15 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
-using JsonStores.Samples.SampleApp.Commands;
+using JsonStores.Samples.SampleStores.Commands;
 
-namespace JsonStores.Samples.SampleApp
+namespace JsonStores.Samples.SampleStores
 {
     internal static class Program
     {
         private static int Main(string[] args)
         {
-            var command = new RootCommand("Json Stores Sample App");
+            var command = new RootCommand("Sample Stores");
 
             command.AddConfigCommand();
             command.AddCountryCommand();

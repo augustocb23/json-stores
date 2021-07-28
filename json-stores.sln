@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonStores", "JsonStores\JsonStores.csproj", "{08355564-670D-4D82-957E-9B9C92B8C648}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonStores.Samples.SampleApp", "Samples\SampleApp\JsonStores.Samples.SampleApp.csproj", "{59C8DF2B-EC3B-40E6-A468-F0F012F172CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonStores.Samples.SampleStores", "Samples\SampleStores\JsonStores.Samples.SampleStores.csproj", "{59C8DF2B-EC3B-40E6-A468-F0F012F172CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{36ADC45C-DC40-4DB9-AC5D-4FDBBE03369E}"
 ProjectSection(SolutionItems) = preProject
