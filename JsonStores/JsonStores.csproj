@@ -9,7 +9,7 @@
         <Title>JsonStores</Title>
         <Description>Persist your data on JSON files in an easy and flexible way</Description>
         <PackageId>JsonStores</PackageId>
-        <Version>0.4.1</Version>
+        <Version>0.5.0</Version>
         <PackageReleaseNotes>Thread-safe stores</PackageReleaseNotes>
         <Authors>Augusto César Bisognin</Authors>
         <PackageTags>json repository store</PackageTags>

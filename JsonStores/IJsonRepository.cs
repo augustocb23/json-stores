@@ -14,6 +14,11 @@ namespace JsonStores
     public interface IJsonRepository<T, in TKey> where T : class where TKey : notnull
     {
         /// <summary>
+        ///     A flag indicating if an index for keys should be created.
+        /// </summary>
+        bool UseIndexedKeys { get; }
+
+        /// <summary>
         ///     Get all items on the collection.
         /// </summary>
         /// <returns>A <see cref="IEnumerable{T}" /> with the items.</returns>

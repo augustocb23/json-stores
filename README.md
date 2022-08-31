@@ -81,6 +81,8 @@ Use the class `JsonStoreOptions` to customize
             FileExtension = "arq"
             // looks file writing time to avoid data loss - default is 'true'
             ThrowOnSavingChangedFile = false;
+            // create an index for keys on repositories - default is 'true'
+            UseIndexedKeys = false;
         };
         
         services.AddJsonRepository<MyClass, MyClassId>(options);

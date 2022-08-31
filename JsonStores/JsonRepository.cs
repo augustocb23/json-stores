@@ -19,6 +19,12 @@ namespace JsonStores
         /// <param name="options">The options for this repository.</param>
         public JsonRepository(JsonStoreOptions options) : base(options)
         {
+            if (options.UseIndexedKeys)
+            {
+                UseIndexedKeys = true;
+                Keys = new HashSet<TKey>();
+            }
+
             var keyProperty = RepositoryKeyValidator.GetKeyProperty<T, TKey>();
             GetKeyValue = keyProperty.Compile();
         }
@@ -30,18 +36,33 @@ namespace JsonStores
         /// <param name="keyProperty">A <see cref="Func{T,TResult}" /> to get the object's key.</param>
         public JsonRepository(JsonStoreOptions options, Expression<Func<T, TKey>> keyProperty) : base(options)
         {
+            if (options.UseIndexedKeys)
+            {
+                UseIndexedKeys = true;
+                Keys = new HashSet<TKey>();
+            }
+
             GetKeyValue = keyProperty.Compile();
         }
 
         /// <summary>
-        ///     A collections containing the loaded data.
+        ///     A collection containing the loaded data.
         /// </summary>
         private ICollection<T> Items { get; set; }
+
+        /// <summary>
+        ///     A set containing the keys of the repository.
+        /// </summary>
+        private ISet<TKey> Keys { get; set; }
+
 
         /// <summary>
         ///     Method used to obtain an object's key value.
         /// </summary>
         private Func<T, TKey> GetKeyValue { get; }
+
+        /// <inheritdoc />
+        public bool UseIndexedKeys { get; }
 
         /// <inheritdoc />
         public virtual async Task<IEnumerable<T>> GetAllAsync()
@@ -54,16 +75,18 @@ namespace JsonStores
         public virtual async Task<T> GetByIdAsync(TKey id)
         {
             if (Items == null || FileChanged) await LoadAsync();
-            return Items.SingleOrDefault(item => id.Equals(GetKeyValue(item)));
+            return Items!.SingleOrDefault(item => id.Equals(GetKeyValue(item)));
         }
 
         /// <inheritdoc />
         public virtual async Task AddAsync(T item)
         {
-            if (await ExistsAsync(GetKeyValue(item)))
-                throw new UniquenessConstraintViolationException(item, GetKeyValue(item));
+            var keyValue = GetKeyValue(item);
+            if (await ExistsAsync(keyValue))
+                throw new UniquenessConstraintViolationException(item, keyValue);
 
             Items.Add(item);
+            Keys?.Add(keyValue);
         }
 
         /// <inheritdoc />
@@ -79,8 +102,7 @@ namespace JsonStores
         public virtual async Task<bool> ExistsAsync([NotNull] TKey id)
         {
             if (Items == null || FileChanged) await LoadAsync();
-
-            return Items.Any(item => id.Equals(GetKeyValue(item)));
+            return UseIndexedKeys ? Keys.Contains(id) : Items!.Any(item => id.Equals(GetKeyValue(item)));
         }
 
         /// <inheritdoc />
@@ -88,10 +110,11 @@ namespace JsonStores
         {
             if (Items == null || FileChanged) await LoadAsync();
 
-            var obj = Items.SingleOrDefault(item => id.Equals(GetKeyValue(item)));
+            var obj = Items!.SingleOrDefault(item => id.Equals(GetKeyValue(item)));
             if (obj == null) throw new ItemNotFoundException(id);
 
             Items.Remove(obj);
+            Keys?.Remove(id);
         }
 
         /// <inheritdoc />
@@ -111,6 +134,21 @@ namespace JsonStores
         {
             if (FileExists) Items = await ReadFileAsync();
             else Items = new List<T>();
+
+            if (UseIndexedKeys)
+            {
+                Keys = null;
+                CreateIndex();
+            }
+        }
+
+        private void CreateIndex()
+        {
+            var keys = new HashSet<TKey>();
+            foreach (var item in Items)
+                keys.Add(GetKeyValue(item));
+
+            Keys = keys;
         }
     }
 }

@@ -53,7 +53,8 @@ namespace JsonStores.Samples.SampleStores.Commands
         {
             var c = new Command("set", "Sets a system configuration")
             {
-                new Argument<string>("property"), new Argument<string>("value")
+                new Argument<string>("property"),
+                new Argument<string>("value")
             };
             c.Handler = CommandHandler.Create(async (bool verbose, string property, string value) =>
             {
@@ -68,14 +69,7 @@ namespace JsonStores.Samples.SampleStores.Commands
                     return 5;
                 }
 
-                object castedValue = propertyInfo.Name switch
-                {
-                    nameof(Settings.Name) => value,
-                    nameof(Settings.Email) => value,
-                    nameof(Settings.Age) => int.Parse(value),
-                    _ => throw new ArgumentOutOfRangeException(nameof(property), property,
-                        $"Can't change property '{property}'")
-                };
+                var castedValue = Convert.ChangeType(value, propertyInfo.GetType());
 
                 if (verbose) ConsoleRendering.ClearLineAndWrite("Loading settings...");
                 var settings = await store.ReadOrCreateAsync();

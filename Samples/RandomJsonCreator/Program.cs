@@ -35,6 +35,7 @@ namespace JsonStores.Samples.RandomJsonCreator
 
             var verbose = args.Contains("--verbose");
             var deletePreviousFiles = args.Contains("--deletePrevious");
+            var disableIndex = args.Contains("--disableIndex");
 
             var fullFilePath = Path.Join(Environment.CurrentDirectory, FilePath);
             if (deletePreviousFiles && Directory.GetFiles(fullFilePath).Length > 0)
@@ -51,11 +52,12 @@ namespace JsonStores.Samples.RandomJsonCreator
                 {
                     NamingStrategy = new StaticNamingStrategy(GetRandomString()),
                     Location = fullFilePath,
-                    ThrowOnSavingChangedFile = false
+                    ThrowOnSavingChangedFile = false,
+                    UseIndexedKeys = !disableIndex
                 });
 
                 for (var itemIndex = 0; itemIndex < itemsPerFile; itemIndex++)
-                    items.AddAsync(new FileItem {Id = itemIndex, Data = GetRandomString()}).Wait();
+                    items.AddAsync(new FileItem { Id = itemIndex, Data = GetRandomString() }).Wait();
 
                 if (verbose) PrintMessage($"Data generated. Saving file {fileIndex}...");
                 items.SaveChangesAsync().Wait();

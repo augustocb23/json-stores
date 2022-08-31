@@ -49,6 +49,11 @@ namespace JsonStores
         public bool ThrowOnSavingChangedFile { get; set; } = true;
 
         /// <summary>
+        ///     A flag indicating if should create an index for keys on repositories.
+        /// </summary>
+        public bool UseIndexedKeys { get; set; } = true;
+
+        /// <summary>
         ///     Gets full path to the file for specified type, using current <see cref="NamingStrategy"/>.
         /// </summary>
         /// <typeparam name="T">The generic type to use with <see cref="INamingStrategy.GetName{T}"/> method.</typeparam>

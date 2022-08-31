@@ -57,6 +57,9 @@ namespace JsonStores.Concurrent
         /// </summary>
         private Func<T, TKey> GetKeyValue { get; }
 
+        /// <inheritdoc />
+        public bool UseIndexedKeys { get; }
+
         /// <summary>
         ///     Load (or initialize) current content.
         /// </summary>
